@@ -1,0 +1,27 @@
+# --- Build y dependencias ---
+#
+/target/
+/*.war
+*.jar
+*.class
+
+# --- Logs ---
+*.log
+
+# --- Archivos temporales del sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Configuración de IDEs ---
+.idea/
+.vscode/
+*.iml
+
+# --- Credenciales y configuraciones locales ---
+credentials.properties
+.env
+
+# --- Archivos de respaldo ---
+*~
+*.bak
+
