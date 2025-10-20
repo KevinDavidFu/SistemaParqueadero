@@ -1,39 +1,21 @@
 package com.example.parking.model;
 
+import java.time.LocalDateTime;
+
 public class Vehiculo {
-    private int id;
+    private int idVehiculo;
     private String placa;
     private String tipo;
-    private String propietario;
-    private String horaEntrada;
-    private String horaSalida;
+    private LocalDateTime horaEntrada;
+    private LocalDateTime horaSalida;
+    private double totalPagar;
 
-    public Vehiculo() {
+    public int getIdVehiculo() {
+        return idVehiculo;
     }
 
-    public Vehiculo(int id, String placa, String tipo, String propietario, String horaEntrada, String horaSalida) {
-        this.id = id;
-        this.placa = placa;
-        this.tipo = tipo;
-        this.propietario = propietario;
-        this.horaEntrada = horaEntrada;
-        this.horaSalida = horaSalida;
-    }
-
-    public Vehiculo(String placa, String tipo, String propietario, String horaEntrada, String horaSalida) {
-        this.placa = placa;
-        this.tipo = tipo;
-        this.propietario = propietario;
-        this.horaEntrada = horaEntrada;
-        this.horaSalida = horaSalida;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setIdVehiculo(int idVehiculo) {
+        this.idVehiculo = idVehiculo;
     }
 
     public String getPlaca() {
@@ -52,39 +34,27 @@ public class Vehiculo {
         this.tipo = tipo;
     }
 
-    public String getPropietario() {
-        return propietario;
-    }
-
-    public void setPropietario(String propietario) {
-        this.propietario = propietario;
-    }
-
-    public String getHoraEntrada() {
+    public LocalDateTime getHoraEntrada() {
         return horaEntrada;
     }
 
-    public void setHoraEntrada(String horaEntrada) {
+    public void setHoraEntrada(LocalDateTime horaEntrada) {
         this.horaEntrada = horaEntrada;
     }
 
-    public String getHoraSalida() {
+    public LocalDateTime getHoraSalida() {
         return horaSalida;
     }
 
-    public void setHoraSalida(String horaSalida) {
+    public void setHoraSalida(LocalDateTime horaSalida) {
         this.horaSalida = horaSalida;
     }
 
-    @Override
-    public String toString() {
-        return "Vehiculo{" +
-                "id=" + id +
-                ", placa='" + placa + '\'' +
-                ", tipo='" + tipo + '\'' +
-                ", propietario='" + propietario + '\'' +
-                ", horaEntrada='" + horaEntrada + '\'' +
-                ", horaSalida='" + horaSalida + '\'' +
-                '}';
+    public double getTotalPagar() {
+        return totalPagar;
+    }
+
+    public void setTotalPagar(double totalPagar) {
+        this.totalPagar = totalPagar;
     }
 }
