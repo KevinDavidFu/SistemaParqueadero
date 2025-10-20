@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Tarifa</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">Agregar Tarifa</h2>
+    <form id="formTarifa" method="post" action="tarifas">
+        <div class="mb-3">
+            <label for="tipoVehiculo" class="form-label">Tipo de Vehículo</label>
+            <input type="text" class="form-control" id="tipoVehiculo" name="tipoVehiculo" required>
+        </div>
+        <div class="mb-3">
+            <label for="precioHora" class="form-label">Precio por Hora</label>
+            <input type="number" step="0.01" class="form-control" id="precioHora" name="precioHora" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar</button>
+        <a href="index.html" class="btn btn-secondary">Volver</a>
+    </form>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>
