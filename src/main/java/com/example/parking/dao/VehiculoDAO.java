@@ -11,13 +11,14 @@ public class VehiculoDAO {
 
     // Agregar vehículo
     public boolean agregarVehiculo(Vehiculo vehiculo) {
-        String sql = "INSERT INTO vehiculo (placa, tipo, hora_entrada) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Vehiculo (placa, modelo, tipo, ingreso) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, vehiculo.getPlaca());
-            stmt.setString(2, vehiculo.getTipo());
-            stmt.setTimestamp(3, Timestamp.valueOf(vehiculo.getHoraEntrada()));
+            stmt.setString(2, vehiculo.getModelo());
+            stmt.setString(3, vehiculo.getTipo());
+            stmt.setTimestamp(4, Timestamp.valueOf(vehiculo.getIngreso()));
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
@@ -29,21 +30,22 @@ public class VehiculoDAO {
     // Obtener todos los vehículos
     public List<Vehiculo> obtenerVehiculos() {
         List<Vehiculo> vehiculos = new ArrayList<>();
-        String sql = "SELECT * FROM vehiculo";
+        String sql = "SELECT * FROM Vehiculo";
         try (Connection conn = DBUtil.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 Vehiculo v = new Vehiculo();
-                v.setIdVehiculo(rs.getInt("id_vehiculo"));
+                v.setId(rs.getInt("id"));
                 v.setPlaca(rs.getString("placa"));
+                v.setModelo(rs.getString("modelo"));
                 v.setTipo(rs.getString("tipo"));
-                v.setHoraEntrada(rs.getTimestamp("hora_entrada").toLocalDateTime());
-                v.setHoraSalida(rs.getTimestamp("hora_salida") != null
-                        ? rs.getTimestamp("hora_salida").toLocalDateTime()
-                        : null);
-                v.setTotalPagar(rs.getDouble("total_pagar"));
+                v.setIngreso(rs.getTimestamp("ingreso").toLocalDateTime());
+                Timestamp salidaTs = rs.getTimestamp("salida");
+                v.setSalida(salidaTs != null ? salidaTs.toLocalDateTime() : null);
+                v.setTotalPagado(rs.getDouble("total_pagado"));
+                v.setActivo(rs.getBoolean("activo"));
                 vehiculos.add(v);
             }
 
@@ -56,7 +58,7 @@ public class VehiculoDAO {
     // Buscar vehículo por placa
     public Vehiculo buscarPorPlaca(String placa) {
         Vehiculo v = null;
-        String sql = "SELECT * FROM vehiculo WHERE placa = ?";
+        String sql = "SELECT * FROM Vehiculo WHERE placa = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -64,9 +66,58 @@ public class VehiculoDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     v = new Vehiculo();
-                    v.setIdVehiculo(rs.getInt("id_vehiculo"));
+                    v.setId(rs.getInt("id"));
                     v.setPlaca(rs.getString("placa"));
+                    v.setModelo(rs.getString("modelo"));
                     v.setTipo(rs.getString("tipo"));
-                    v.setHoraEntrada(rs.getTimestamp("hora_entrada").toLocalDateTime());
-                    v.setHoraSalida(rs.getTimestamp("hora_salida") != null
-                            ? rs.getTimestamp("hora_salida").toL_
+                    v.setIngreso(rs.getTimestamp("ingreso").toLocalDateTime());
+                    Timestamp salidaTs = rs.getTimestamp("salida");
+                    v.setSalida(salidaTs != null ? salidaTs.toLocalDateTime() : null);
+                    v.setTotalPagado(rs.getDouble("total_pagado"));
+                    v.setActivo(rs.getBoolean("activo"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return v;
+    }
+
+    // Actualizar vehículo
+    public boolean actualizarVehiculo(Vehiculo vehiculo) {
+        String sql = "UPDATE Vehiculo SET modelo = ?, tipo = ?, ingreso = ?, salida = ?, total_pagado = ?, activo = ? WHERE placa = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, vehiculo.getModelo());
+            stmt.setString(2, vehiculo.getTipo());
+            stmt.setTimestamp(3, Timestamp.valueOf(vehiculo.getIngreso()));
+            stmt.setTimestamp(4, vehiculo.getSalida() != null ? Timestamp.valueOf(vehiculo.getSalida()) : null);
+            stmt.setDouble(5, vehiculo.getTotalPagado());
+            stmt.setBoolean(6, vehiculo.isActivo());
+            stmt.setString(7, vehiculo.getPlaca());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Eliminar vehículo por placa
+    public boolean eliminarPorPlaca(String placa) {
+        String sql = "DELETE FROM Vehiculo WHERE placa = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, placa);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+}
