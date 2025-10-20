@@ -1,31 +1,33 @@
 package com.example.parking.model;
 
 public class Tarifa {
-    private int idTarifa;
-    private String tipoVehiculo;
-    private double precioHora;
+    private int id;
+    private String tipoVehiculo; // Carro, Moto, etc.
+    private double valorHora;
 
-    public int getIdTarifa() {
-        return idTarifa;
-    }
+    public Tarifa() {}
 
-    public void setIdTarifa(int idTarifa) {
-        this.idTarifa = idTarifa;
-    }
-
-    public String getTipoVehiculo() {
-        return tipoVehiculo;
-    }
-
-    public void setTipoVehiculo(String tipoVehiculo) {
+    public Tarifa(int id, String tipoVehiculo, double valorHora) {
+        this.id = id;
         this.tipoVehiculo = tipoVehiculo;
+        this.valorHora = valorHora;
     }
 
-    public double getPrecioHora() {
-        return precioHora;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setPrecioHora(double precioHora) {
-        this.precioHora = precioHora;
+    public String getTipoVehiculo() { return tipoVehiculo; }
+    public void setTipoVehiculo(String tipoVehiculo) { this.tipoVehiculo = tipoVehiculo; }
+
+    public double getValorHora() { return valorHora; }
+    public void setValorHora(double valorHora) { this.valorHora = valorHora; }
+
+    @Override
+    public String toString() {
+        return "Tarifa{" +
+                "id=" + id +
+                ", tipoVehiculo='" + tipoVehiculo + '\'' +
+                ", valorHora=" + valorHora +
+                '}';
     }
 }

@@ -1,16 +1,15 @@
-CREATE DATABASE IF NOT EXISTS parkingDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE parkingDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE parkingDB;
-
--- Tabla tarfia
-CREATE TABLE IF NOT EXISTS Tarifa (
+-- Tabla Tarifa
+CREATE TABLE Tarifa (
   id INT AUTO_INCREMENT PRIMARY KEY,
   tipo VARCHAR(50) NOT NULL,
   precio_por_hora DECIMAL(10,2) NOT NULL,
   creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabla vehiculo
-CREATE TABLE IF NOT EXISTS Vehiculo (
+-- Tabla Vehiculo
+CREATE TABLE Vehiculo (
   id INT AUTO_INCREMENT PRIMARY KEY,
   placa VARCHAR(15) NOT NULL UNIQUE,
   modelo VARCHAR(100),
@@ -22,3 +21,6 @@ CREATE TABLE IF NOT EXISTS Vehiculo (
   creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+SHOW TABLES;
+SELECT * FROM Vehiculo;
+SELECT * FROM Tarifa;

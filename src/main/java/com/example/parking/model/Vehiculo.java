@@ -3,58 +3,45 @@ package com.example.parking.model;
 import java.time.LocalDateTime;
 
 public class Vehiculo {
-    private int idVehiculo;
+    private int id;
     private String placa;
-    private String tipo;
-    private LocalDateTime horaEntrada;
-    private LocalDateTime horaSalida;
-    private double totalPagar;
+    private String tipo; // Carro, Moto, etc.
+    private LocalDateTime fechaEntrada;
+    private LocalDateTime fechaSalida;
 
-    public int getIdVehiculo() {
-        return idVehiculo;
-    }
+    public Vehiculo() {}
 
-    public void setIdVehiculo(int idVehiculo) {
-        this.idVehiculo = idVehiculo;
-    }
-
-    public String getPlaca() {
-        return placa;
-    }
-
-    public void setPlaca(String placa) {
+    public Vehiculo(int id, String placa, String tipo, LocalDateTime fechaEntrada, LocalDateTime fechaSalida) {
+        this.id = id;
         this.placa = placa;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
         this.tipo = tipo;
+        this.fechaEntrada = fechaEntrada;
+        this.fechaSalida = fechaSalida;
     }
 
-    public LocalDateTime getHoraEntrada() {
-        return horaEntrada;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setHoraEntrada(LocalDateTime horaEntrada) {
-        this.horaEntrada = horaEntrada;
-    }
+    public String getPlaca() { return placa; }
+    public void setPlaca(String placa) { this.placa = placa; }
 
-    public LocalDateTime getHoraSalida() {
-        return horaSalida;
-    }
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
 
-    public void setHoraSalida(LocalDateTime horaSalida) {
-        this.horaSalida = horaSalida;
-    }
+    public LocalDateTime getFechaEntrada() { return fechaEntrada; }
+    public void setFechaEntrada(LocalDateTime fechaEntrada) { this.fechaEntrada = fechaEntrada; }
 
-    public double getTotalPagar() {
-        return totalPagar;
-    }
+    public LocalDateTime getFechaSalida() { return fechaSalida; }
+    public void setFechaSalida(LocalDateTime fechaSalida) { this.fechaSalida = fechaSalida; }
 
-    public void setTotalPagar(double totalPagar) {
-        this.totalPagar = totalPagar;
+    @Override
+    public String toString() {
+        return "Vehiculo{" +
+                "id=" + id +
+                ", placa='" + placa + '\'' +
+                ", tipo='" + tipo + '\'' +
+                ", fechaEntrada=" + fechaEntrada +
+                ", fechaSalida=" + fechaSalida +
+                '}';
     }
 }
