@@ -1,33 +1,31 @@
 package com.example.parking.model;
 
+import java.time.LocalDateTime;
+
 public class Tarifa {
     private int id;
-    private String tipoVehiculo; // Carro, Moto, etc.
-    private double valorHora;
+    private String tipo;
+    private double precioPorHora;
+    private LocalDateTime creadoEn;
 
     public Tarifa() {}
 
-    public Tarifa(int id, String tipoVehiculo, double valorHora) {
+    public Tarifa(int id, String tipo, double precioPorHora, LocalDateTime creadoEn) {
         this.id = id;
-        this.tipoVehiculo = tipoVehiculo;
-        this.valorHora = valorHora;
+        this.tipo = tipo;
+        this.precioPorHora = precioPorHora;
+        this.creadoEn = creadoEn;
     }
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public String getTipoVehiculo() { return tipoVehiculo; }
-    public void setTipoVehiculo(String tipoVehiculo) { this.tipoVehiculo = tipoVehiculo; }
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
 
-    public double getValorHora() { return valorHora; }
-    public void setValorHora(double valorHora) { this.valorHora = valorHora; }
+    public double getPrecioPorHora() { return precioPorHora; }
+    public void setPrecioPorHora(double precioPorHora) { this.precioPorHora = precioPorHora; }
 
-    @Override
-    public String toString() {
-        return "Tarifa{" +
-                "id=" + id +
-                ", tipoVehiculo='" + tipoVehiculo + '\'' +
-                ", valorHora=" + valorHora +
-                '}';
-    }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

@@ -9,85 +9,54 @@ import java.util.List;
 
 public class TarifaDAO {
 
-    public void insertar(Tarifa tarifa) {
-        String sql = "INSERT INTO tarifa (tipoVehiculo, valorHora) VALUES (?, ?)";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, tarifa.getTipoVehiculo());
-            stmt.setDouble(2, tarifa.getValorHora());
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void agregarTarifa(Tarifa tarifa) throws SQLException {
+        String sql = "INSERT INTO Tarifa(tipo, precio_por_hora) VALUES (?, ?)";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, tarifa.getTipo());
+            ps.setDouble(2, tarifa.getPrecioPorHora());
+            ps.executeUpdate();
         }
     }
 
-    public Tarifa obtenerPorId(int id) {
-        String sql = "SELECT * FROM tarifa WHERE id = ?";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Tarifa(
-                        rs.getInt("id"),
-                        rs.getString("tipoVehiculo"),
-                        rs.getDouble("valorHora")
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public List<Tarifa> listarTodos() {
+    public List<Tarifa> obtenerTarifas() throws SQLException {
         List<Tarifa> lista = new ArrayList<>();
-        String sql = "SELECT * FROM tarifa";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
+        String sql = "SELECT * FROM Tarifa";
+        try (Connection con = DBUtil.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
-                Tarifa t = new Tarifa(
-                        rs.getInt("id"),
-                        rs.getString("tipoVehiculo"),
-                        rs.getDouble("valorHora")
-                );
+                Tarifa t = new Tarifa();
+                t.setId(rs.getInt("id"));
+                t.setTipo(rs.getString("tipo"));
+                t.setPrecioPorHora(rs.getDouble("precio_por_hora"));
+                Timestamp creado = rs.getTimestamp("creado_en");
+                if (creado != null) {
+                    t.setCreadoEn(creado.toLocalDateTime());
+                }
                 lista.add(t);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return lista;
     }
 
-    public void actualizar(Tarifa tarifa) {
-        String sql = "UPDATE tarifa SET tipoVehiculo=?, valorHora=? WHERE id=?";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, tarifa.getTipoVehiculo());
-            stmt.setDouble(2, tarifa.getValorHora());
-            stmt.setInt(3, tarifa.getId());
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void actualizarTarifa(Tarifa tarifa) throws SQLException {
+        String sql = "UPDATE Tarifa SET tipo=?, precio_por_hora=? WHERE id=?";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, tarifa.getTipo());
+            ps.setDouble(2, tarifa.getPrecioPorHora());
+            ps.setInt(3, tarifa.getId());
+            ps.executeUpdate();
         }
     }
 
-    public void eliminar(int id) {
-        String sql = "DELETE FROM tarifa WHERE id=?";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void eliminarTarifa(int id) throws SQLException {
+        String sql = "DELETE FROM Tarifa WHERE id=?";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
         }
     }
 }
