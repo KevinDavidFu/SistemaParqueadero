@@ -1,4 +1,4 @@
-package main.java.com.example.parking.util;
+package com.example.parking.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
