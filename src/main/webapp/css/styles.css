@@ -1,0 +1,20 @@
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+
+h1, h2 {
+    color: #343a40;
+}
+
+table {
+    margin-top: 20px;
+}
+
+table th, table td {
+    text-align: center;
+}
+
+.btn {
+    margin-right: 10px;
+}
