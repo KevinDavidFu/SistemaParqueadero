@@ -1,4 +1,4 @@
-package main.java.com.example.parking.dao;
+package com.example.parking.dao;
 
 import com.example.parking.model.Vehiculo;
 import com.example.parking.util.DBUtil;
