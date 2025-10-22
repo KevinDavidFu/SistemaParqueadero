@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/tarifas")
@@ -28,10 +29,11 @@ public class TarifaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("text/html;charset=UTF-8");
-        
+
         try (PrintWriter out = response.getWriter()) {
             List<Tarifa> lista = servicioTarifa.listarTarifas();
-            
+            if (lista == null) lista = new ArrayList<>();
+
             out.println("<html><head><title>Lista de Tarifas</title></head><body>");
             out.println("<h2>Tarifas registradas</h2>");
             out.println("<table border='1'><tr><th>ID</th><th>Tipo Vehículo</th><th>Precio por Hora</th></tr>");
@@ -56,7 +58,12 @@ public class TarifaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String tipo = request.getParameter("tipo");
-        double precioPorHora = Double.parseDouble(request.getParameter("precioPorHora"));
+        String precioStr = request.getParameter("precioPorHora");
+
+        if (tipo == null || tipo.trim().isEmpty()) tipo = "";
+        if (precioStr == null || precioStr.trim().isEmpty()) precioStr = "0";
+
+        double precioPorHora = Double.parseDouble(precioStr.trim());
 
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {

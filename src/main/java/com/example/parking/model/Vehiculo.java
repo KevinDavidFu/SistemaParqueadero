@@ -7,7 +7,7 @@ public class Vehiculo {
     private String placa;
     private String modelo;
     private String tipo;
-    private LocalDateTime ingreso;
+    private LocalDateTime ingreso; // Hora de entrada
     private LocalDateTime salida;
     private double totalPagado;
     private boolean activo;
@@ -52,4 +52,8 @@ public class Vehiculo {
 
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
+
+    public LocalDateTime getHoraEntrada() {
+        return this.ingreso;
+    }
 }

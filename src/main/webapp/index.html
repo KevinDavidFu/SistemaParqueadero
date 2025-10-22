@@ -2,19 +2,46 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema Parqueadero</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Parqueadero 🅿️</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Sistema de Gestión de Parqueadero</h1>
-        <div class="list-group">
-            <a href="vehiculos.html" class="list-group-item list-group-item-action">Vehículos</a>
-            <a href="tarifas.html" class="list-group-item list-group-item-action">Tarifas</a>
-            <a href="agregarVehiculo.html" class="list-group-item list-group-item-action">Agregar Vehículo</a>
-            <a href="agregarTarifa.html" class="list-group-item list-group-item-action">Agregar Tarifa</a>
+    <div class="header">
+        <h1>Sistema de Gestión de Parqueadero</h1>
+        <p>Control y administración de vehículos y tarifas.</p>
+    </div>
+
+    <div class="main-content">
+        <div class="card-container">
+            <div class="action-card">
+                <h2>🚗 Vehículos</h2>
+                <p>Visualiza y administra todos los vehículos activos en el parqueadero.</p>
+                <div class="card-links">
+                    <a href="vehiculos" class="btn btn-primary">Ver Activos</a>
+                    <a href="agregarVehiculo.html" class="btn btn-secondary">Registrar Ingreso</a>
+                </div>
+            </div>
+
+            <div class="action-card">
+                <h2>💲 Tarifas</h2>
+                <p>Revisa la estructura actual de precios por hora y por tipo de vehículo.</p>
+                <div class="card-links">
+                    <a href="tarifas" class="btn btn-primary">Ver Tarifas</a>
+                    <a href="agregarTarifa.html" class="btn btn-secondary">Crear Tarifa</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-bar">
+            <span>✅ <a href="vehiculos?estado=activo">Ver resumen de vehículos activos (5)</a></span>
+            <span>🕒 Último ingreso: Hace 5 minutos</span>
         </div>
     </div>
+
+    <footer>
+        <p>&copy; 2025 Gestión de Parqueadero | Desarrollado con Java Servlets.</p>
+    </footer>
 </body>
 </html>

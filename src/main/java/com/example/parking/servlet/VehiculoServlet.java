@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/vehiculos")
@@ -28,17 +29,18 @@ public class VehiculoServlet extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("text/html;charset=UTF-8");
-        
+
         try (PrintWriter out = response.getWriter()) {
             List<Vehiculo> lista = servicioVehiculo.listarVehiculos();
-            
+            if (lista == null) lista = new ArrayList<>();
+
             out.println("<html><head><title>Lista de Vehículos</title></head><body>");
             out.println("<h2>Vehículos registrados</h2>");
             out.println("<table border='1'><tr><th>ID</th><th>Placa</th><th>Modelo</th><th>Tipo</th><th>Ingreso</th><th>Activo</th></tr>");
             for (Vehiculo v : lista) {
                 out.println("<tr><td>" + v.getId() + "</td><td>" + v.getPlaca() +
-                        "</td><td>" + v.getModelo() + "</td><td>" + v.getTipo() + 
-                        "</td><td>" + v.getIngreso() + "</td><td>" + v.isActivo() + "</td></tr>");
+                        "</td><td>" + v.getModelo() + "</td><td>" + v.getTipo() +
+                        "</td><td>" + v.getHoraEntrada() + "</td><td>" + v.isActivo() + "</td></tr>");
             }
             out.println("</table>");
             out.println("<a href='index.html'>Volver al inicio</a>");
@@ -60,10 +62,14 @@ public class VehiculoServlet extends HttpServlet {
         String modelo = request.getParameter("modelo");
         String tipo = request.getParameter("tipo");
 
+        if (placa == null) placa = "";
+        if (modelo == null) modelo = "";
+        if (tipo == null) tipo = "";
+
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             boolean insertado = servicioVehiculo.registrarVehiculo(placa, modelo, tipo);
-            
+
             if (insertado) {
                 out.println("<h3>Vehículo registrado correctamente.</h3>");
             } else {

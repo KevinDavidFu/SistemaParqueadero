@@ -2,26 +2,40 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Vehículo</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container mt-5">
-    <h2 class="mb-4">Agregar Vehículo</h2>
-    <form id="formVehiculo" method="post" action="vehiculos">
-        <div class="mb-3">
-            <label for="placa" class="form-label">Placa</label>
-            <input type="text" class="form-control" id="placa" name="placa" required>
+<div class="container">
+    <h1>Agregar Vehículo</h1>
+
+    <form action="vehiculos" method="POST" class="form">
+        <div class="form-group">
+            <label for="placa">Placa:</label>
+            <input type="text" id="placa" name="placa" required placeholder="Ej: ABC123">
         </div>
-        <div class="mb-3">
-            <label for="tipo" class="form-label">Tipo de Vehículo</label>
-            <input type="text" class="form-control" id="tipo" name="tipo" required>
+
+        <div class="form-group">
+            <label for="modelo">Modelo:</label>
+            <input type="text" id="modelo" name="modelo" required placeholder="Ej: Toyota Corolla">
         </div>
-        <button type="submit" class="btn btn-primary">Agregar</button>
-        <a href="index.html" class="btn btn-secondary">Volver</a>
+
+        <div class="form-group">
+            <label for="tipo">Tipo de Vehículo:</label>
+            <select id="tipo" name="tipo" required>
+                <option value="">Seleccione...</option>
+                <option value="Carro">Carro</option>
+                <option value="Moto">Moto</option>
+                <option value="Bicicleta">Bicicleta</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Registrar Vehículo</button>
+            <a href="index.html" class="btn btn-secondary">Cancelar</a>
+        </div>
     </form>
 </div>
-<script src="js/main.js"></script>
 </body>
 </html>
