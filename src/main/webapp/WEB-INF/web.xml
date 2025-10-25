@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+         https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+    <display-name>Sistema de Parqueadero</display-name>
+
+    <!-- Servlet API REST - Tarifas -->
+    <servlet>
+        <servlet-name>TarifaAPIServlet</servlet-name>
+        <servlet-class>com.example.parking.servlet.TarifaAPIServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TarifaAPIServlet</servlet-name>
+        <url-pattern>/api/tarifas</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet API REST - Vehículos -->
+    <servlet>
+        <servlet-name>VehiculoAPIServlet</servlet-name>
+        <servlet-class>com.example.parking.servlet.VehiculoAPIServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VehiculoAPIServlet</servlet-name>
+        <url-pattern>/api/vehiculos</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet de Cobro -->
+    <servlet>
+        <servlet-name>CobroServlet</servlet-name>
+        <servlet-class>com.example.parking.servlet.CobroServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CobroServlet</servlet-name>
+        <url-pattern>/cobro</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlets HTML tradicionales (opcional, para compatibilidad) -->
+    <servlet>
+        <servlet-name>TarifaServlet</servlet-name>
+        <servlet-class>com.example.parking.servlet.TarifaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TarifaServlet</servlet-name>
+        <url-pattern>/tarifas</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VehiculoServlet</servlet-name>
+        <servlet-class>com.example.parking.servlet.VehiculoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VehiculoServlet</servlet-name>
+        <url-pattern>/vehiculos</url-pattern>
+    </servlet-mapping>
+
+    <!-- Página de inicio -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- Configuración de encoding UTF-8 -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ignore</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+</web-app>
