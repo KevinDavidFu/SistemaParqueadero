@@ -37,7 +37,7 @@
         <url-pattern>/cobro</url-pattern>
     </servlet-mapping>
 
-    <!-- Servlets HTML tradicionales (opcional, para compatibilidad) -->
+    <!-- Servlets HTML tradicionales -->
     <servlet>
         <servlet-name>TarifaServlet</servlet-name>
         <servlet-class>com.example.parking.servlet.TarifaServlet</servlet-class>
@@ -60,23 +60,5 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-
-    <!-- Configuración de encoding UTF-8 -->
-    <filter>
-        <filter-name>encodingFilter</filter-name>
-        <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
-        <init-param>
-            <param-name>encoding</param-name>
-            <param-value>UTF-8</param-value>
-        </init-param>
-        <init-param>
-            <param-name>ignore</param-name>
-            <param-value>false</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>encodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
 
 </web-app>
