@@ -1,10 +1,11 @@
 package com.example.parking.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.io.InputStream;
 
 public class DBUtil {
     private static String URL;
@@ -26,14 +27,20 @@ public class DBUtil {
                     // Valores por defecto
                     URL = "jdbc:mysql://localhost:3306/parkingDB";
                     USER = "root";
-                    PASSWORD = "KevDa#120038#_";
+                    PASSWORD = ""; // CAMBIA ESTO por tu contraseña
                 }
+            } catch (IOException e) {
+                // Si falla la lectura del archivo, usar valores por defecto
+                System.err.println("No se pudo cargar application.properties, usando valores por defecto");
+                URL = "jdbc:mysql://localhost:3306/parkingDB";
+                USER = "root";
+                PASSWORD = "";
             }
             
             // Cargar driver
             Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (Exception e) {
-            throw new RuntimeException("Error al inicializar configuración de BD", e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Error: Driver de MySQL no encontrado", e);
         }
     }
 
