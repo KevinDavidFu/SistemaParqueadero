@@ -5,34 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Tarifa</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .form { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .form-group input, .form-group select { 
+            width: 100%; padding: 12px; border: 2px solid #ddd; 
+            border-radius: 5px; font-size: 16px; 
+        }
+        .form-group input:focus, .form-group select:focus { 
+            outline: none; border-color: #007bff; 
+        }
+        .form-actions { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+        .error { color: #dc3545; padding: 15px; background: #f8d7da; border-radius: 5px; margin: 10px 0; }
+        .success { color: #28a745; padding: 15px; background: #d4edda; border-radius: 5px; margin: 10px 0; }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1>Agregar Tarifa</h1>
+    <div class="container">
+        <h1>💲 Registrar Tarifa</h1>
+        
+        <div id="message" style="display:none;"></div>
+        
+        <form id="formTarifa" class="form">
+            <div class="form-group">
+                <label for="tipo">Tipo de Vehículo: *</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="">Seleccione...</option>
+                    <option value="Carro">Carro</option>
+                    <option value="Moto">Moto</option>
+                    <option value="Bicicleta">Bicicleta</option>
+                    <option value="Camioneta">Camioneta</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
 
-    <form action="tarifas" method="POST" class="form">
-        <div class="form-group">
-            <label for="tipo">Tipo de Vehículo:</label>
-            <select id="tipo" name="tipo" required>
-                <option value="">Seleccione...</option>
-                <option value="Carro">Carro</option>
-                <option value="Moto">Moto</option>
-                <option value="Bicicleta">Bicicleta</option>
-            </select>
-        </div>
+            <div class="form-group">
+                <label for="precioPorHora">Precio por Hora (COP): *</label>
+                <input type="number" id="precioPorHora" name="precioPorHora"
+                       required min="100" step="100"
+                       placeholder="Ej: 5000">
+            </div>
 
-        <div class="form-group">
-            <label for="precioPorHora">Precio por Hora:</label>
-            <input type="number" id="precioPorHora" name="precioPorHora"
-                   required min="0" step="0.01"
-                   placeholder="Ej: 4000">
-        </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">✓ Registrar</button>
+                <a href="tarifas.html" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Registrar Tarifa</button>
-            <a href="index.html" class="btn btn-secondary">Cancelar</a>
-        </div>
-    </form>
-</div>
+    <script>
+        function showMessage(message, type = 'error') {
+            const msgDiv = document.getElementById('message');
+            msgDiv.className = type;
+            msgDiv.textContent = message;
+            msgDiv.style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById('formTarifa').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams(formData);
+            
+            try {
+                const response = await fetch('/SistemaParqueadero/api/tarifas', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: params
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                    setTimeout(() => window.location.href = 'tarifas.html', 2000);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+    </script>
 </body>
 </html>
