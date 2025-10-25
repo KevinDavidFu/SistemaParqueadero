@@ -20,8 +20,8 @@ Thumbs.db
 # --- Credenciales y configuraciones locales ---
 credentials.properties
 .env
+**src/main/resources/application.properties**
 
 # --- Archivos de respaldo ---
 *~
 *.bak
-
