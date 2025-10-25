@@ -12,12 +12,11 @@ import com.example.parking.service.ServicioTarifa;
 import com.google.gson.Gson;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/api/tarifas")
+
 public class TarifaAPIServlet extends HttpServlet {
 
     private ServicioTarifa servicioTarifa;

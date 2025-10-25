@@ -14,12 +14,11 @@ import com.example.parking.service.ServicioVehiculo;
 import com.google.gson.Gson;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/cobro")
+
 public class CobroServlet extends HttpServlet {
 
     private ServicioVehiculo servicioVehiculo;

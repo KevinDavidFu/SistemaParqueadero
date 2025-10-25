@@ -12,12 +12,10 @@ import com.example.parking.service.ServicioVehiculo;
 import com.google.gson.Gson;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/api/vehiculos")
 public class VehiculoAPIServlet extends HttpServlet {
 
     private ServicioVehiculo servicioVehiculo;
@@ -65,7 +63,6 @@ public class VehiculoAPIServlet extends HttpServlet {
         Map<String, Object> result = new HashMap<>();
         
         try (PrintWriter out = response.getWriter()) {
-            // Validaciones
             if (placa == null || placa.trim().isEmpty()) {
                 result.put("success", false);
                 result.put("message", "La placa es requerida");
@@ -102,34 +99,35 @@ public class VehiculoAPIServlet extends HttpServlet {
             response.getWriter().print(gson.toJson(result));
         }
     }
+
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    
+        
         response.setContentType("application/json;charset=UTF-8");
-    
+        
         String placa = request.getParameter("placa");
         Map<String, Object> result = new HashMap<>();
-    
+        
         try (PrintWriter out = response.getWriter()) {
             if (placa == null || placa.trim().isEmpty()) {
                 result.put("success", false);
                 result.put("message", "La placa es requerida");
                 out.print(gson.toJson(result));
                 return;
-        }
+            }
 
             boolean eliminado = servicioVehiculo.eliminarVehiculo(placa);
-        
+            
             if (eliminado) {
                 result.put("success", true);
                 result.put("message", "Vehículo eliminado correctamente");
             } else {
                 result.put("success", false);
                 result.put("message", "No se pudo eliminar el vehículo");
-         }
+            }
             out.print(gson.toJson(result));
-        
+            
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             result.put("success", false);
