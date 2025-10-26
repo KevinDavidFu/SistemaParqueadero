@@ -12,10 +12,12 @@ import com.example.parking.service.ServicioVehiculo;
 import com.google.gson.Gson;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@WebServlet("/api/vehiculos")
 public class VehiculoAPIServlet extends HttpServlet {
 
     private ServicioVehiculo servicioVehiculo;
@@ -23,8 +25,15 @@ public class VehiculoAPIServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        servicioVehiculo = new ServicioVehiculo();
-        gson = new Gson();
+        try {
+            servicioVehiculo = new ServicioVehiculo();
+            gson = new Gson();
+            System.out.println("[VehiculoAPIServlet] Servlet inicializado correctamente");
+        } catch (Exception e) {
+            System.err.println("[VehiculoAPIServlet] ERROR al inicializar: " + e.getMessage());
+            e.printStackTrace();
+            throw new ServletException("Error al inicializar VehiculoAPIServlet", e);
+        }
     }
 
     @Override
@@ -33,20 +42,32 @@ public class VehiculoAPIServlet extends HttpServlet {
         
         response.setContentType("application/json;charset=UTF-8");
         response.setHeader("Access-Control-Allow-Origin", "*");
+        PrintWriter out = response.getWriter();
         
-        try (PrintWriter out = response.getWriter()) {
+        try {
+            System.out.println("[VehiculoAPIServlet] GET - Obteniendo vehículos");
             List<Vehiculo> vehiculos = servicioVehiculo.listarVehiculos();
+            
             Map<String, Object> result = new HashMap<>();
             result.put("success", true);
             result.put("data", vehiculos);
             result.put("count", vehiculos.size());
-            out.print(gson.toJson(result));
+            
+            String json = gson.toJson(result);
+            System.out.println("[VehiculoAPIServlet] Respuesta con " + vehiculos.size() + " vehículos");
+            out.print(json);
+            out.flush();
+            
         } catch (SQLException e) {
+            System.err.println("[VehiculoAPIServlet] ERROR SQL: " + e.getMessage());
+            e.printStackTrace();
+            
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "Error al obtener vehículos: " + e.getMessage());
-            response.getWriter().print(gson.toJson(error));
+            error.put("message", "Error de base de datos: " + e.getMessage());
+            out.print(gson.toJson(error));
+            out.flush();
         }
     }
 
@@ -55,18 +76,22 @@ public class VehiculoAPIServlet extends HttpServlet {
             throws ServletException, IOException {
         
         response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
         
         String placa = request.getParameter("placa");
         String modelo = request.getParameter("modelo");
         String tipo = request.getParameter("tipo");
+        
+        System.out.println("[VehiculoAPIServlet] POST - placa: " + placa + ", tipo: " + tipo);
 
         Map<String, Object> result = new HashMap<>();
         
-        try (PrintWriter out = response.getWriter()) {
+        try {
             if (placa == null || placa.trim().isEmpty()) {
                 result.put("success", false);
                 result.put("message", "La placa es requerida");
                 out.print(gson.toJson(result));
+                out.flush();
                 return;
             }
             
@@ -74,6 +99,7 @@ public class VehiculoAPIServlet extends HttpServlet {
                 result.put("success", false);
                 result.put("message", "El tipo de vehículo es requerido");
                 out.print(gson.toJson(result));
+                out.flush();
                 return;
             }
 
@@ -91,12 +117,17 @@ public class VehiculoAPIServlet extends HttpServlet {
                 result.put("message", "No se pudo registrar el vehículo");
             }
             out.print(gson.toJson(result));
+            out.flush();
             
         } catch (SQLException e) {
+            System.err.println("[VehiculoAPIServlet] ERROR SQL en POST: " + e.getMessage());
+            e.printStackTrace();
+            
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             result.put("success", false);
-            result.put("message", "Error: " + e.getMessage());
-            response.getWriter().print(gson.toJson(result));
+            result.put("message", "Error de base de datos: " + e.getMessage());
+            out.print(gson.toJson(result));
+            out.flush();
         }
     }
 
@@ -105,15 +136,20 @@ public class VehiculoAPIServlet extends HttpServlet {
             throws ServletException, IOException {
         
         response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
         
         String placa = request.getParameter("placa");
+        
+        System.out.println("[VehiculoAPIServlet] DELETE - placa: " + placa);
+        
         Map<String, Object> result = new HashMap<>();
         
-        try (PrintWriter out = response.getWriter()) {
+        try {
             if (placa == null || placa.trim().isEmpty()) {
                 result.put("success", false);
                 result.put("message", "La placa es requerida");
                 out.print(gson.toJson(result));
+                out.flush();
                 return;
             }
 
@@ -127,12 +163,17 @@ public class VehiculoAPIServlet extends HttpServlet {
                 result.put("message", "No se pudo eliminar el vehículo");
             }
             out.print(gson.toJson(result));
+            out.flush();
             
         } catch (SQLException e) {
+            System.err.println("[VehiculoAPIServlet] ERROR SQL en DELETE: " + e.getMessage());
+            e.printStackTrace();
+            
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             result.put("success", false);
-            result.put("message", "Error: " + e.getMessage());
-            response.getWriter().print(gson.toJson(result));
+            result.put("message", "Error de base de datos: " + e.getMessage());
+            out.print(gson.toJson(result));
+            out.flush();
         }
     }
 }
