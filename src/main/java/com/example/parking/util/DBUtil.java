@@ -14,44 +14,65 @@ public class DBUtil {
 
     static {
         try {
-            // Intentar cargar desde archivo de propiedades
+            Properties prop = new Properties();
+            
             try (InputStream input = DBUtil.class.getClassLoader()
                     .getResourceAsStream("application.properties")) {
+                
                 if (input != null) {
-                    Properties prop = new Properties();
                     prop.load(input);
-                    URL = prop.getProperty("db.url", "jdbc:mysql://localhost:3306/parkingDB");
-                    USER = prop.getProperty("db.user", "root");
-                    PASSWORD = prop.getProperty("db.password", "");
+                    URL = prop.getProperty("db.url");
+                    USER = prop.getProperty("db.user");
+                    PASSWORD = prop.getProperty("db.password");
+                    
+                    System.out.println("[DBUtil] Configuración cargada desde application.properties");
+                    System.out.println("[DBUtil] URL: " + URL);
+                    System.out.println("[DBUtil] USER: " + USER);
                 } else {
-                    // Valores por defecto
+                    System.err.println("[DBUtil] application.properties NO ENCONTRADO");
                     URL = "jdbc:mysql://localhost:3306/parkingDB";
                     USER = "root";
-                    PASSWORD = ""; // CAMBIA ESTO por tu contraseña
+                    PASSWORD = "";
                 }
             } catch (IOException e) {
-                // Si falla la lectura del archivo, usar valores por defecto
-                System.err.println("No se pudo cargar application.properties, usando valores por defecto");
+                System.err.println("[DBUtil] Error al leer application.properties: " + e.getMessage());
                 URL = "jdbc:mysql://localhost:3306/parkingDB";
                 USER = "root";
                 PASSWORD = "";
             }
             
-            // Cargar driver
             Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("[DBUtil] Driver MySQL cargado correctamente");
+            
         } catch (ClassNotFoundException e) {
+            System.err.println("[DBUtil] ERROR: Driver de MySQL NO encontrado");
+            e.printStackTrace();
             throw new RuntimeException("Error: Driver de MySQL no encontrado", e);
         }
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        try {
+            Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("[DBUtil] Conexión a base de datos EXITOSA");
+            return conn;
+        } catch (SQLException e) {
+            System.err.println("[DBUtil] ERROR al conectar a la base de datos");
+            System.err.println("[DBUtil] URL: " + URL);
+            System.err.println("[DBUtil] USER: " + USER);
+            System.err.println("[DBUtil] Mensaje: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
     
     public static boolean testConnection() {
         try (Connection conn = getConnection()) {
-            return conn != null && !conn.isClosed();
+            boolean isValid = conn != null && !conn.isClosed();
+            System.out.println("[DBUtil] Test de conexión: " + (isValid ? "OK" : "FALLIDO"));
+            return isValid;
         } catch (SQLException e) {
+            System.err.println("[DBUtil] Test de conexión FALLIDO: " + e.getMessage());
             return false;
         }
     }
