@@ -7,26 +7,6 @@
 
     <display-name>Sistema de Parqueadero</display-name>
 
-    <!-- Servlet API REST - Tarifas -->
-    <servlet>
-        <servlet-name>TarifaAPIServlet</servlet-name>
-        <servlet-class>com.example.parking.servlet.TarifaAPIServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>TarifaAPIServlet</servlet-name>
-        <url-pattern>/api/tarifas</url-pattern>
-    </servlet-mapping>
-
-    <!-- Servlet API REST - Vehículos -->
-    <servlet>
-        <servlet-name>VehiculoAPIServlet</servlet-name>
-        <servlet-class>com.example.parking.servlet.VehiculoAPIServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>VehiculoAPIServlet</servlet-name>
-        <url-pattern>/api/vehiculos</url-pattern>
-    </servlet-mapping>
-
     <!-- Servlet de Cobro -->
     <servlet>
         <servlet-name>CobroServlet</servlet-name>
