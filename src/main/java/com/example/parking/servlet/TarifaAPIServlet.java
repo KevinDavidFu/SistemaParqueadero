@@ -2,13 +2,13 @@ package com.example.parking.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import com.example.parking.model.Tarifa;
-import com.example.parking.service.ServicioTarifa;
+import com.example.parking.dto.TarifaDTO;
+import com.example.parking.entity.TarifaEntity;
+import com.example.parking.mapper.TarifaMapper;
+import com.example.parking.repository.TarifaRepository;
 import com.google.gson.Gson;
 
 import jakarta.servlet.ServletException;
@@ -20,15 +20,15 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/api/tarifas")
 public class TarifaAPIServlet extends HttpServlet {
 
-    private ServicioTarifa servicioTarifa;
+    private TarifaRepository tarifaRepository;
     private Gson gson;
 
     @Override
     public void init() throws ServletException {
         try {
-            servicioTarifa = new ServicioTarifa();
+            tarifaRepository = new TarifaRepository();
             gson = new Gson();
-            System.out.println("[TarifaAPIServlet] Servlet inicializado correctamente");
+            System.out.println("[TarifaAPIServlet] Servlet inicializado correctamente con TarifaRepository");
         } catch (Exception e) {
             System.err.println("[TarifaAPIServlet] ERROR al inicializar: " + e.getMessage());
             e.printStackTrace();
@@ -36,55 +36,57 @@ public class TarifaAPIServlet extends HttpServlet {
         }
     }
 
+    // ---------------------------------------------------------
+    // MÉTODO GET - LISTAR TARIFAS
+    // ---------------------------------------------------------
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         response.setContentType("application/json;charset=UTF-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         PrintWriter out = response.getWriter();
         
         try {
             System.out.println("[TarifaAPIServlet] GET - Obteniendo tarifas");
-            List<Tarifa> tarifas = servicioTarifa.listarTarifas();
+
+            List<TarifaEntity> tarifas = tarifaRepository.findAll();
+            List<TarifaDTO> tarifasDTO = tarifas.stream()
+                    .map(TarifaMapper::toDTO)
+                    .collect(Collectors.toList());
             
             Map<String, Object> result = new HashMap<>();
             result.put("success", true);
-            result.put("data", tarifas);
-            
+            result.put("data", tarifasDTO);
+            result.put("count", tarifasDTO.size());
+
             String json = gson.toJson(result);
-            System.out.println("[TarifaAPIServlet] Respuesta: " + json);
+            System.out.println("[TarifaAPIServlet] Respuesta con " + tarifasDTO.size() + " tarifas");
             out.print(json);
             out.flush();
             
-        } catch (SQLException e) {
-            System.err.println("[TarifaAPIServlet] ERROR SQL: " + e.getMessage());
-            e.printStackTrace();
-            
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("message", "Error de base de datos: " + e.getMessage());
-            out.print(gson.toJson(error));
-            out.flush();
-            
         } catch (Exception e) {
-            System.err.println("[TarifaAPIServlet] ERROR INESPERADO: " + e.getMessage());
+            System.err.println("[TarifaAPIServlet] ERROR en GET: " + e.getMessage());
             e.printStackTrace();
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "Error interno: " + e.getMessage());
+            error.put("message", "Error al obtener las tarifas: " + e.getMessage());
             out.print(gson.toJson(error));
             out.flush();
         }
     }
 
+    // ---------------------------------------------------------
+    // MÉTODO POST - REGISTRAR NUEVA TARIFA
+    // ---------------------------------------------------------
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         response.setContentType("application/json;charset=UTF-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         PrintWriter out = response.getWriter();
         
         String tipo = request.getParameter("tipo");
@@ -95,6 +97,7 @@ public class TarifaAPIServlet extends HttpServlet {
         Map<String, Object> result = new HashMap<>();
         
         try {
+            // Validaciones básicas
             if (tipo == null || tipo.trim().isEmpty()) {
                 result.put("success", false);
                 result.put("message", "El tipo de vehículo es requerido");
@@ -120,25 +123,40 @@ public class TarifaAPIServlet extends HttpServlet {
                 return;
             }
 
-            servicioTarifa.agregarTarifa(tipo.trim(), precio);
-            result.put("success", true);
-            result.put("message", "Tarifa registrada correctamente");
+            // Crear y guardar entidad
+            TarifaEntity tarifa = new TarifaEntity();
+            tarifa.setTipo(tipo.trim());
+            tarifa.setPrecioPorHora(precio);
+            tarifa.setActiva(true);
+
+            TarifaEntity saved = tarifaRepository.save(tarifa);
+
+            if (saved != null) {
+                result.put("success", true);
+                result.put("message", "Tarifa registrada correctamente");
+                result.put("data", TarifaMapper.toDTO(saved));
+            } else {
+                result.put("success", false);
+                result.put("message", "No se pudo registrar la tarifa");
+            }
+
             out.print(gson.toJson(result));
             out.flush();
             
         } catch (NumberFormatException e) {
+            System.err.println("[TarifaAPIServlet] ERROR en formato de precio: " + e.getMessage());
             result.put("success", false);
             result.put("message", "Precio inválido: " + e.getMessage());
             out.print(gson.toJson(result));
             out.flush();
             
-        } catch (SQLException e) {
-            System.err.println("[TarifaAPIServlet] ERROR SQL en POST: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("[TarifaAPIServlet] ERROR en POST: " + e.getMessage());
             e.printStackTrace();
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             result.put("success", false);
-            result.put("message", "Error de base de datos: " + e.getMessage());
+            result.put("message", "Error interno: " + e.getMessage());
             out.print(gson.toJson(result));
             out.flush();
         }
