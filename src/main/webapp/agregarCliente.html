@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Cliente</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .form { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+        .form-group input, .form-group select { 
+            width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; 
+        }
+        .error { color: #dc3545; padding: 15px; background: #f8d7da; border-radius: 5px; }
+        .success { color: #28a745; padding: 15px; background: #d4edda; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 Registrar Cliente</h1>
+        
+        <div id="message" style="display:none;"></div>
+        
+        <form id="formCliente" class="form">
+            <div class="form-group">
+                <label for="nombre">Nombre Completo: *</label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="documento">Documento: *</label>
+                <input type="text" id="documento" name="documento" required>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="tipoCliente">Tipo de Cliente:</label>
+                <select id="tipoCliente" name="tipoCliente">
+                    <option value="Eventual">Eventual</option>
+                    <option value="Regular">Regular</option>
+                    <option value="VIP">VIP</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="descuento">Descuento (%):</label>
+                <input type="number" id="descuento" name="descuento" min="0" max="100" value="0">
+            </div>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                <button type="submit" class="btn btn-primary">✓ Registrar</button>
+                <a href="clientes.html" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function showMessage(message, type = 'error') {
+            const msgDiv = document.getElementById('message');
+            msgDiv.className = type;
+            msgDiv.textContent = message;
+            msgDiv.style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById('formCliente').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams(formData);
+            
+            try {
+                const response = await fetch('/SistemaParqueadero/api/clientes', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: params
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                    setTimeout(() => window.location.href = 'clientes.html', 2000);
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
