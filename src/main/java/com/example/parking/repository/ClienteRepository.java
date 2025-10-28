@@ -24,7 +24,7 @@ public class ClienteRepository {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw e;
+            throw new RuntimeException("Error al guardar cliente", e);
         } finally {
             em.close();
         }
@@ -59,7 +59,7 @@ public class ClienteRepository {
     public List<ClienteEntity> findAll() {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            return em.createQuery("SELECT c FROM ClienteEntity c", ClienteEntity.class)
+            return em.createQuery("SELECT c FROM ClienteEntity c ORDER BY c.id", ClienteEntity.class)
                     .getResultList();
         } finally {
             em.close();
@@ -79,7 +79,7 @@ public class ClienteRepository {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw e;
+            throw new RuntimeException("Error al eliminar cliente", e);
         } finally {
             em.close();
         }

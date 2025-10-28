@@ -24,7 +24,7 @@ public class TarifaRepository {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw e;
+            throw new RuntimeException("Error al guardar tarifa", e);
         } finally {
             em.close();
         }
@@ -59,7 +59,7 @@ public class TarifaRepository {
     public List<TarifaEntity> findAll() {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            return em.createQuery("SELECT t FROM TarifaEntity t", TarifaEntity.class)
+            return em.createQuery("SELECT t FROM TarifaEntity t ORDER BY t.tipo", TarifaEntity.class)
                     .getResultList();
         } finally {
             em.close();
@@ -70,7 +70,7 @@ public class TarifaRepository {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             return em.createQuery(
-                "SELECT t FROM TarifaEntity t WHERE t.activa = :activa", 
+                "SELECT t FROM TarifaEntity t WHERE t.activa = :activa ORDER BY t.tipo", 
                 TarifaEntity.class)
                 .setParameter("activa", activa)
                 .getResultList();
@@ -92,7 +92,7 @@ public class TarifaRepository {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw e;
+            throw new RuntimeException("Error al eliminar tarifa", e);
         } finally {
             em.close();
         }

@@ -52,34 +52,39 @@ public class VehiculoEntity {
         actualizadoEn = LocalDateTime.now();
     }
     
+    public VehiculoEntity() {}
+
     // Getters y Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
-    
+
     public String getPlaca() { return placa; }
     public void setPlaca(String placa) { this.placa = placa; }
-    
+
     public String getModelo() { return modelo; }
     public void setModelo(String modelo) { this.modelo = modelo; }
-    
+
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
-    
+
     public ClienteEntity getCliente() { return cliente; }
     public void setCliente(ClienteEntity cliente) { this.cliente = cliente; }
-    
+
     public LocalDateTime getIngreso() { return ingreso; }
     public void setIngreso(LocalDateTime ingreso) { this.ingreso = ingreso; }
-    
+
     public LocalDateTime getSalida() { return salida; }
     public void setSalida(LocalDateTime salida) { this.salida = salida; }
-    
+
     public Double getTotalPagado() { return totalPagado; }
     public void setTotalPagado(Double totalPagado) { this.totalPagado = totalPagado; }
-    
+
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
-    
+
     public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
+
     public LocalDateTime getActualizadoEn() { return actualizadoEn; }
+    public void setActualizadoEn(LocalDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
 }

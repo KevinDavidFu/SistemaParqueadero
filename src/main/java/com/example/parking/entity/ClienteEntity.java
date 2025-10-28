@@ -55,31 +55,36 @@ public class ClienteEntity {
         Regular, VIP, Eventual
     }
     
-    // Getters y Setters completos
+    public ClienteEntity() {}
+
+    // Getters y Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
-    
+
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
-    
+
     public String getDocumento() { return documento; }
     public void setDocumento(String documento) { this.documento = documento; }
-    
+
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
-    
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-    
+
     public TipoCliente getTipoCliente() { return tipoCliente; }
     public void setTipoCliente(TipoCliente tipoCliente) { this.tipoCliente = tipoCliente; }
-    
+
     public Double getDescuento() { return descuento; }
     public void setDescuento(Double descuento) { this.descuento = descuento; }
-    
+
     public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
+
     public LocalDateTime getActualizadoEn() { return actualizadoEn; }
-    
+    public void setActualizadoEn(LocalDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
+
     public List<VehiculoEntity> getVehiculos() { return vehiculos; }
     public void setVehiculos(List<VehiculoEntity> vehiculos) { this.vehiculos = vehiculos; }
 }

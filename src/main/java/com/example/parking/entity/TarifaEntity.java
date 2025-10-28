@@ -37,22 +37,24 @@ public class TarifaEntity {
         actualizadoEn = LocalDateTime.now();
     }
     
+    public TarifaEntity() {}
+
     // Getters y Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
-    
+
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
-    
+
     public Double getPrecioPorHora() { return precioPorHora; }
     public void setPrecioPorHora(Double precioPorHora) { this.precioPorHora = precioPorHora; }
-    
+
     public Boolean getActiva() { return activa; }
     public void setActiva(Boolean activa) { this.activa = activa; }
-    
+
     public LocalDateTime getCreadoEn() { return creadoEn; }
     public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
-    
+
     public LocalDateTime getActualizadoEn() { return actualizadoEn; }
     public void setActualizadoEn(LocalDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
 }

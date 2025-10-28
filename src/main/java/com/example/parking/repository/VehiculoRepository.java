@@ -24,7 +24,7 @@ public class VehiculoRepository {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw e;
+            throw new RuntimeException("Error al guardar vehículo", e);
         } finally {
             em.close();
         }
@@ -59,7 +59,7 @@ public class VehiculoRepository {
     public List<VehiculoEntity> findAll() {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            return em.createQuery("SELECT v FROM VehiculoEntity v", VehiculoEntity.class)
+            return em.createQuery("SELECT v FROM VehiculoEntity v ORDER BY v.id DESC", VehiculoEntity.class)
                     .getResultList();
         } finally {
             em.close();
@@ -70,7 +70,7 @@ public class VehiculoRepository {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             return em.createQuery(
-                "SELECT v FROM VehiculoEntity v WHERE v.activo = :activo", 
+                "SELECT v FROM VehiculoEntity v WHERE v.activo = :activo ORDER BY v.ingreso DESC", 
                 VehiculoEntity.class)
                 .setParameter("activo", activo)
                 .getResultList();
@@ -92,7 +92,7 @@ public class VehiculoRepository {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            throw e;
+            throw new RuntimeException("Error al eliminar vehículo", e);
         } finally {
             em.close();
         }

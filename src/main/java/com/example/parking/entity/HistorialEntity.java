@@ -51,39 +51,42 @@ public class HistorialEntity {
         creadoEn = LocalDateTime.now();
     }
     
+    public HistorialEntity() {}
+
     // Getters y Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
-    
+
     public VehiculoEntity getVehiculo() { return vehiculo; }
     public void setVehiculo(VehiculoEntity vehiculo) { this.vehiculo = vehiculo; }
-    
+
     public ClienteEntity getCliente() { return cliente; }
     public void setCliente(ClienteEntity cliente) { this.cliente = cliente; }
-    
+
     public LocalDateTime getFechaIngreso() { return fechaIngreso; }
     public void setFechaIngreso(LocalDateTime fechaIngreso) { this.fechaIngreso = fechaIngreso; }
-    
+
     public LocalDateTime getFechaSalida() { return fechaSalida; }
     public void setFechaSalida(LocalDateTime fechaSalida) { this.fechaSalida = fechaSalida; }
-    
+
     public Double getHorasTotales() { return horasTotales; }
     public void setHorasTotales(Double horasTotales) { this.horasTotales = horasTotales; }
-    
+
     public Double getTarifaAplicada() { return tarifaAplicada; }
     public void setTarifaAplicada(Double tarifaAplicada) { this.tarifaAplicada = tarifaAplicada; }
-    
+
     public Double getDescuentoAplicado() { return descuentoAplicado; }
     public void setDescuentoAplicado(Double descuentoAplicado) { this.descuentoAplicado = descuentoAplicado; }
-    
+
     public Double getTotalCobrado() { return totalCobrado; }
     public void setTotalCobrado(Double totalCobrado) { this.totalCobrado = totalCobrado; }
-    
+
     public String getTipoVehiculo() { return tipoVehiculo; }
     public void setTipoVehiculo(String tipoVehiculo) { this.tipoVehiculo = tipoVehiculo; }
-    
+
     public String getPlaca() { return placa; }
     public void setPlaca(String placa) { this.placa = placa; }
-    
+
     public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }
