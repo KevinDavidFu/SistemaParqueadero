@@ -3,12 +3,15 @@ package com.example.parking.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.example.parking.dto.VehiculoDTO;
 import com.example.parking.entity.VehiculoEntity;
-import com.example.parking.mapper.VehiculoMapper;
+import com.example.parking.mapper.VehiculoEntityMapper;
 import com.example.parking.repository.VehiculoRepository;
 import com.google.gson.Gson;
 
@@ -39,14 +42,11 @@ public class VehiculoAPIServlet extends HttpServlet {
             System.out.println("[VehiculoAPIServlet] Servlet inicializado correctamente con VehiculoRepository");
         } catch (Exception e) {
             System.err.println("[VehiculoAPIServlet] ERROR al inicializar: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[Stack Trace]: " + e);
             throw new ServletException("Error al inicializar VehiculoAPIServlet", e);
         }
     }
 
-    // ---------------------------------------------------------
-    // MÉTODO GET - LISTAR VEHÍCULOS
-    // ---------------------------------------------------------
     @Override
     @Operation(
         summary = "Listar todos los vehículos",
@@ -72,7 +72,7 @@ public class VehiculoAPIServlet extends HttpServlet {
             
             List<VehiculoEntity> vehiculos = vehiculoRepository.findAll();
             List<VehiculoDTO> vehiculosDTO = vehiculos.stream()
-                    .map(VehiculoMapper::toDTO)
+                    .map(VehiculoEntityMapper::toDTO)
                     .collect(Collectors.toList());
             
             Map<String, Object> result = new HashMap<>();
@@ -87,7 +87,7 @@ public class VehiculoAPIServlet extends HttpServlet {
             
         } catch (Exception e) {
             System.err.println("[VehiculoAPIServlet] ERROR en GET: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[Stack Trace]: " + e);
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             Map<String, Object> error = new HashMap<>();
@@ -98,9 +98,6 @@ public class VehiculoAPIServlet extends HttpServlet {
         }
     }
 
-    // ---------------------------------------------------------
-    // MÉTODO POST - REGISTRAR NUEVO VEHÍCULO
-    // ---------------------------------------------------------
     @Override
     @Operation(
         summary = "Registrar nuevo vehículo",
@@ -159,7 +156,7 @@ public class VehiculoAPIServlet extends HttpServlet {
             if (saved != null) {
                 result.put("success", true);
                 result.put("message", "Vehículo registrado correctamente");
-                result.put("data", VehiculoMapper.toDTO(saved));
+                result.put("data", VehiculoEntityMapper.toDTO(saved));
             } else {
                 result.put("success", false);
                 result.put("message", "No se pudo registrar el vehículo");
@@ -169,7 +166,7 @@ public class VehiculoAPIServlet extends HttpServlet {
             
         } catch (Exception e) {
             System.err.println("[VehiculoAPIServlet] ERROR en POST: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[Stack Trace]: " + e);
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             result.put("success", false);
@@ -179,9 +176,6 @@ public class VehiculoAPIServlet extends HttpServlet {
         }
     }
 
-    // ---------------------------------------------------------
-    // MÉTODO DELETE - ELIMINAR VEHÍCULO POR PLACA
-    // ---------------------------------------------------------
     @Override
     @Operation(
         summary = "Eliminar vehículo",
@@ -231,7 +225,7 @@ public class VehiculoAPIServlet extends HttpServlet {
             
         } catch (Exception e) {
             System.err.println("[VehiculoAPIServlet] ERROR en DELETE: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[Stack Trace]: " + e);
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             result.put("success", false);
