@@ -19,10 +19,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 @SuppressWarnings("CallToPrintStackTrace")
 @WebServlet("/api/clientes")
 @Tag(name = "Clientes", description = "Gestión de clientes del parqueadero")
@@ -163,15 +165,20 @@ public class ClienteAPIServlet extends HttpServlet {
                 }
             }
             
+            // CORRECCIÓN: Convertir String a BigDecimal
             if (descuentoStr != null && !descuentoStr.trim().isEmpty()) {
                 try {
-                    double descuento = Double.parseDouble(descuentoStr.trim());
-                    if (descuento >= 0 && descuento <= 100) {
-                        cliente.setDescuento(descuento);
+                    double descuentoDouble = Double.parseDouble(descuentoStr.trim());
+                    if (descuentoDouble >= 0 && descuentoDouble <= 100) {
+                        cliente.setDescuento(BigDecimal.valueOf(descuentoDouble));
+                    } else {
+                        cliente.setDescuento(BigDecimal.ZERO);
                     }
                 } catch (NumberFormatException e) {
-                    cliente.setDescuento(0.0);
+                    cliente.setDescuento(BigDecimal.ZERO);
                 }
+            } else {
+                cliente.setDescuento(BigDecimal.ZERO);
             }
             
             // Guardar
@@ -230,7 +237,6 @@ public class ClienteAPIServlet extends HttpServlet {
                 return;
             }
             
-            @SuppressWarnings("UnnecessaryTemporaryOnConversionFromString")
             Integer id = Integer.parseInt(idStr);
             
             if (clienteRepository.findById(id).isEmpty()) {
