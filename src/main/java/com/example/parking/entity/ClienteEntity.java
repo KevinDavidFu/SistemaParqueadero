@@ -1,63 +1,68 @@
 package com.example.parking.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "Cliente")
 public class ClienteEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @Column(nullable = false, length = 100)
     private String nombre;
-    
+
     @Column(nullable = false, unique = true, length = 20)
     private String documento;
-    
+
     @Column(length = 20)
     private String telefono;
-    
+
     @Column(length = 100)
     private String email;
-    
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_cliente")
+    @Column(name = "tipo_cliente", nullable = false, length = 20)
     private TipoCliente tipoCliente = TipoCliente.Eventual;
-    
-    @Column(precision = 5, scale = 2)
+
+    @Column(precision = 5, scale = 2, nullable = false)
     private Double descuento = 0.0;
-    
+
     @Column(name = "creado_en", updatable = false)
     private LocalDateTime creadoEn;
-    
+
     @Column(name = "actualizado_en")
     private LocalDateTime actualizadoEn;
-    
-    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
-    private List<VehiculoEntity> vehiculos;
-    
+
+    @JsonIgnore // ⚠ evita recursión infinita al mostrar JSON
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<VehiculoEntity> vehiculos = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         creadoEn = LocalDateTime.now();
         actualizadoEn = LocalDateTime.now();
+        if (descuento == null) descuento = 0.0;
+        if (tipoCliente == null) tipoCliente = TipoCliente.Eventual;
     }
-    
+
     @PreUpdate
     protected void onUpdate() {
         actualizadoEn = LocalDateTime.now();
     }
-    
+
     public enum TipoCliente {
         Regular, VIP, Eventual
     }
-    
+
     public ClienteEntity() {}
 
-    // Getters y Setters
+    // GETTERS Y SETTERS
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 

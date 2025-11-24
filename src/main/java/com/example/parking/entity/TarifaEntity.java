@@ -2,41 +2,49 @@ package com.example.parking.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Tarifa")
 public class TarifaEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
+    /**
+     * Campo usado como FK en Vehiculo.tipo
+     */
     @Column(nullable = false, unique = true, length = 50)
     private String tipo;
-    
+
     @Column(name = "precio_por_hora", nullable = false, precision = 10, scale = 2)
     private Double precioPorHora;
-    
+
     @Column(nullable = false)
     private Boolean activa = true;
-    
+
     @Column(name = "creado_en", updatable = false)
     private LocalDateTime creadoEn;
-    
+
     @Column(name = "actualizado_en")
     private LocalDateTime actualizadoEn;
-    
+
+    // Relación opcional: una tarifa tiene muchos vehículos
+    @OneToMany(mappedBy = "tipo", fetch = FetchType.LAZY)
+    private List<VehiculoEntity> vehiculos;
+
     @PrePersist
     protected void onCreate() {
         creadoEn = LocalDateTime.now();
         actualizadoEn = LocalDateTime.now();
     }
-    
+
     @PreUpdate
     protected void onUpdate() {
         actualizadoEn = LocalDateTime.now();
     }
-    
+
     public TarifaEntity() {}
 
     // Getters y Setters
@@ -57,4 +65,7 @@ public class TarifaEntity {
 
     public LocalDateTime getActualizadoEn() { return actualizadoEn; }
     public void setActualizadoEn(LocalDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
+
+    public List<VehiculoEntity> getVehiculos() { return vehiculos; }
+    public void setVehiculos(List<VehiculoEntity> vehiculos) { this.vehiculos = vehiculos; }
 }

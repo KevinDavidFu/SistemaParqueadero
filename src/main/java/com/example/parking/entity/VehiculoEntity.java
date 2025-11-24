@@ -6,52 +6,59 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "Vehiculo")
 public class VehiculoEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @Column(nullable = false, unique = true, length = 15)
     private String placa;
-    
+
     @Column(length = 100)
     private String modelo;
-    
+
+    /**
+     * Este campo es FK a la tabla Tarifa.tipo
+     * Por eso debe ser un string normal (no enum)
+     */
     @Column(nullable = false, length = 50)
     private String tipo;
-    
+
+    /**
+     * Relación correcta con Cliente (cliente_id)
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     private ClienteEntity cliente;
-    
+
     @Column(nullable = false)
     private LocalDateTime ingreso;
-    
+
     private LocalDateTime salida;
-    
+
     @Column(name = "total_pagado", precision = 10, scale = 2)
     private Double totalPagado = 0.0;
-    
+
     @Column(nullable = false)
     private Boolean activo = true;
-    
+
     @Column(name = "creado_en", updatable = false)
     private LocalDateTime creadoEn;
-    
+
     @Column(name = "actualizado_en")
     private LocalDateTime actualizadoEn;
-    
+
     @PrePersist
     protected void onCreate() {
         creadoEn = LocalDateTime.now();
         actualizadoEn = LocalDateTime.now();
     }
-    
+
     @PreUpdate
     protected void onUpdate() {
         actualizadoEn = LocalDateTime.now();
     }
-    
+
     public VehiculoEntity() {}
 
     // Getters y Setters
