@@ -8,13 +8,13 @@ public class VehiculoDTO {
     @Schema(description = "ID único del vehículo", example = "1")
     private int id;
     
-    @Schema(description = "Placa del vehículo", example = "ABC123", required = true)
+    @Schema(description = "Placa del vehículo", example = "ABC123", requiredMode = Schema.RequiredMode.REQUIRED)
     private String placa;
     
     @Schema(description = "Modelo del vehículo", example = "Toyota Corolla 2020")
     private String modelo;
     
-    @Schema(description = "Tipo de vehículo", example = "Carro", required = true)
+    @Schema(description = "Tipo de vehículo", example = "Carro", requiredMode = Schema.RequiredMode.REQUIRED)
     private String tipo;
     
     @Schema(description = "Fecha y hora de ingreso", example = "2025-01-15T10:30:00")

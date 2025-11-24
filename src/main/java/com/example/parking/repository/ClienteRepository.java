@@ -6,7 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
-
+@SuppressWarnings("ConvertToTryWithResources")
 public class ClienteRepository {
     
     public ClienteEntity save(ClienteEntity cliente) {
@@ -40,6 +40,7 @@ public class ClienteRepository {
         }
     }
     
+    @SuppressWarnings("ConvertToTryWithResources")
     public Optional<ClienteEntity> findByDocumento(String documento) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
@@ -57,12 +58,9 @@ public class ClienteRepository {
     }
     
     public List<ClienteEntity> findAll() {
-        EntityManager em = JPAUtil.getEntityManager();
-        try {
+        try (EntityManager em = JPAUtil.getEntityManager()) {
             return em.createQuery("SELECT c FROM ClienteEntity c ORDER BY c.id", ClienteEntity.class)
                     .getResultList();
-        } finally {
-            em.close();
         }
     }
     

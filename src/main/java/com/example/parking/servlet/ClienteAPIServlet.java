@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+@SuppressWarnings("CallToPrintStackTrace")
 @WebServlet("/api/clientes")
 @Tag(name = "Clientes", description = "Gestión de clientes del parqueadero")
 public class ClienteAPIServlet extends HttpServlet {
@@ -211,6 +211,7 @@ public class ClienteAPIServlet extends HttpServlet {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
         }
     )
+    @SuppressWarnings("CallToPrintStackTrace")
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -229,6 +230,7 @@ public class ClienteAPIServlet extends HttpServlet {
                 return;
             }
             
+            @SuppressWarnings("UnnecessaryTemporaryOnConversionFromString")
             Integer id = Integer.parseInt(idStr);
             
             if (clienteRepository.findById(id).isEmpty()) {

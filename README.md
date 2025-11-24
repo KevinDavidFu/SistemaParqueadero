@@ -1,136 +1,371 @@
-#  SistemaParqueadero (Java/Servlets/JSP)
+# 🚗 SistemaParqueadero - Backend API
 
-**Sistema de gestión de parqueadero completo, desarrollado en Java con arquitectura MVC y MySQL.**
-
----
-
-##  Resumen del Proyecto
-Aplicación web diseñada para la administración de vehículos y tarifas en un parqueadero. Desarrollada en **Java (Servlets + JSP)** siguiendo el patrón **MVC**, utiliza **MySQL** como base de datos y conexión **JDBC**.
-
-### Características Principales:
-- **CRUD completo** para vehículos y tarifas (Registro, Consulta, Edición y Eliminación).
-- **Cálculo automático de cobro** basado en el tiempo de permanencia (precisión decimal).
-- Arquitectura limpia con **separación de capas** (Modelo, DAO, Servicio, Servlet).
-- Interfaz de usuario dinámica con **JSP, HTML5, CSS3 y JavaScript**.
+**API REST profesional para gestión de parqueaderos con Java, JPA/Hibernate y MySQL**
 
 ---
 
-##  Requisitos
-Para ejecutar este proyecto, necesitarás los siguientes componentes instalados y configurados:
+## 📋 Descripción
 
-- **JDK 17** o superior
-- **Apache Maven**
-- **Servidor de Aplicaciones:** Apache Tomcat 10+ (o similar)
-- **Base de Datos:** MySQL o MariaDB
-- **Conector JDBC:** Se recomienda usar la versión `mysql-connector-j-9.4.0.jar` (Maven lo gestiona, pero podría requerir ser agregado al classpath de Tomcat).
+Backend RESTful desarrollado con arquitectura limpia siguiendo principios SOLID y patrones de diseño empresariales. Proporciona endpoints completos para la gestión de vehículos, tarifas, clientes e historial de transacciones.
+
+### Características Principales
+
+- ✅ **API REST completa** con arquitectura RESTful
+- ✅ **JPA/Hibernate** como ORM con repositorios
+- ✅ **Separación de capas**: Entity → Repository → Service → Controller
+- ✅ **DTOs y Mappers** para transferencia de datos
+- ✅ **CORS configurado** para frontend externo
+- ✅ **Documentación OpenAPI/Swagger**
+- ✅ **Health Check endpoint**
 
 ---
 
-##  Instalación Rápida
+## 🛠️ Stack Tecnológico
 
-Sigue estos pasos para configurar y ejecutar el proyecto localmente:
+| Tecnología | Versión | Uso |
+|------------|---------|-----|
+| Java | 21 | Lenguaje principal |
+| Jakarta Servlet | 5.0 | Controladores HTTP |
+| JPA/Hibernate | 6.2.7 | ORM |
+| MySQL | 8.0+ | Base de datos |
+| Maven | 3.8+ | Gestión de dependencias |
+| Jetty | 11 | Servidor de desarrollo |
 
-### 1. Clonar Repositorio y Crear Base de Datos
-Clona el proyecto y utiliza el script SQL provisto para crear la base de datos `parkingDB` con las tablas necesarias.
+---
+
+## 🚀 Instalación
+
+### Requisitos Previos
+
+- JDK 21+
+- Maven 3.8+
+- MySQL 8.0+
+- Puerto 9090 disponible (configurable)
+
+### Pasos de Instalación
 
 ```bash
-# Reemplaza [URL_DEL_REPOSITORIO] con la URL real
-git clone [URL_DEL_REPOSITORIO] 
+# 1. Clonar repositorio
+git clone <URL_REPOSITORIO>
 cd SistemaParqueadero
+
+# 2. Crear base de datos
 mysql -u root -p < parkingDB.sql
-````
 
-### 2\. Configurar Credenciales de Conexión
+# 3. Configurar credenciales
+# Editar: src/main/resources/application.properties
+# Ajustar: db.url, db.user, db.password
 
-Edita el archivo de configuración para establecer las credenciales de tu base de datos:
-
-```
-src/main/java/com/example/parking/util/DBUtil.java
-```
-
-Ajusta las variables estáticas **`USER`**, **`PASS`** y **`URL`** según tu entorno de MySQL.
-
-### 3\. Construir y Empaquetar el Proyecto
-
-Utiliza Maven para limpiar, compilar y generar el archivo de despliegue (`.war`):
-
-```bash
+# 4. Compilar proyecto
 mvn clean package
+
+# 5. Ejecutar con Jetty (desarrollo)
+mvn jetty:run
+
+# 6. O desplegar en Tomcat (producción)
+cp target/SistemaParqueadero.war $TOMCAT_HOME/webapps/
 ```
 
-### 4\. Desplegar en el Servidor de Aplicaciones
-
-Copia el archivo WAR generado en la carpeta de despliegue de tu servidor (ej. Tomcat):
+### Verificar Instalación
 
 ```bash
-cp target/SistemaParqueadero.war <TOMCAT_HOME>/webapps/
+# Health Check
+curl http://localhost:9090/SistemaParqueadero/health
+
+# Listar vehículos
+curl http://localhost:9090/SistemaParqueadero/api/vehiculos
 ```
 
-### 5\. Ejecutar
+---
 
-Inicia o reinicia tu servidor Tomcat. Accede a la aplicación en el navegador:
+## 📡 Endpoints de la API
 
-```arduino
-http://localhost:8080/SistemaParqueadero/
+### Base URL
+
+```
+http://localhost:9090/SistemaParqueadero
 ```
 
------
+### 🚗 Vehículos
 
-##  Estructura del Proyecto
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/vehiculos` | Listar todos los vehículos |
+| POST | `/api/vehiculos` | Registrar entrada de vehículo |
+| DELETE | `/api/vehiculos?placa={placa}` | Eliminar vehículo |
 
-El proyecto sigue el patrón MVC con una clara separación de responsabilidades:
+#### Ejemplo POST - Registrar Vehículo
 
-```css
+```bash
+curl -X POST http://localhost:9090/SistemaParqueadero/api/vehiculos \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "placa=ABC123&modelo=Toyota+Corolla&tipo=Carro"
+```
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "message": "Vehículo registrado correctamente",
+  "data": {
+    "id": 1,
+    "placa": "ABC123",
+    "modelo": "Toyota Corolla",
+    "tipo": "Carro",
+    "ingreso": "2025-01-15T10:30:00",
+    "activo": true,
+    "totalPagado": 0.0
+  }
+}
+```
+
+### 💲 Tarifas
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/tarifas` | Listar todas las tarifas |
+| POST | `/api/tarifas` | Crear nueva tarifa |
+
+### 👤 Clientes
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/clientes` | Listar todos los clientes |
+| POST | `/api/clientes` | Registrar nuevo cliente |
+| DELETE | `/api/clientes?id={id}` | Eliminar cliente |
+
+### 💵 Operaciones
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/cobro?placa={placa}` | Registrar salida y cobro |
+
+#### Ejemplo POST - Cobro
+
+```bash
+curl -X POST "http://localhost:9090/SistemaParqueadero/cobro?placa=ABC123"
+```
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "message": "Cobro realizado exitosamente",
+  "total": 10000.0,
+  "horas": 2.0,
+  "precioPorHora": 5000.0,
+  "vehiculo": "ABC123"
+}
+```
+
+---
+
+## 📂 Estructura del Proyecto
+
+```
 SistemaParqueadero/
+├── src/main/java/com/example/parking/
+│   ├── entity/              # Entidades JPA (VehiculoEntity, TarifaEntity...)
+│   ├── dto/                 # Data Transfer Objects
+│   ├── mapper/              # Conversores Entity ↔ DTO
+│   ├── repository/          # Repositorios JPA
+│   ├── service/             # Lógica de negocio
+│   ├── servlet/             # Controladores REST (API Servlets)
+│   ├── filter/              # Filtros (CORS, UTF8)
+│   └── util/                # Utilidades (JPAUtil, DBUtil)
 │
-├── pom.xml                   # Configuración de dependencias (Maven)
-├── parkingDB.sql             # Script de la base de datos
-├── README.md
+├── src/main/resources/
+│   ├── META-INF/
+│   │   └── persistence.xml  # Configuración JPA
+│   └── application.properties
 │
-└── src/
-    └── main/
-        ├── java/com/example/parking/
-        │   ├── **model/** → Clases de entidades (Vehiculo, Tarifa)
-        │   ├── **dao/** → Data Access Objects (Implementación JDBC)
-        │   ├── **service/** → Lógica de negocio/Servicios
-        │   └── **servlet/** → Controladores (Manejo de peticiones HTTP)
-        │
-        └── webapp/
-            ├── **WEB-INF/** → Archivos de configuración y JSP
-            └── **... (JSP, CSS, JS)** → Vistas y recursos estáticos
+├── parkingDB.sql            # Script de base de datos
+├── pom.xml                  # Dependencias Maven
+└── README.md
 ```
 
------
+---
 
-##  Base de Datos y Lógica de Negocio
+## 🔧 Configuración
 
-El script `parkingDB.sql` establece las siguientes tablas:
+### Base de Datos
 
-| Tabla | Propósito | Relación |
-| :--- | :--- | :--- |
-| `vehiculo` | Almacena datos de entrada/salida, placa y tipo. | N |
-| `tarifa` | Registra los tipos de tarifa y sus valores por hora. | 1 |
+Editar `src/main/resources/application.properties`:
 
-**Cálculo de Cobro:**
-El cobro se determina mediante la fórmula:
-$$ \text{Total} = \text{Tarifa por Hora} \times \text{Horas Totales} $$
-*Las horas totales se calculan con precisión decimal (minutos).*
+```properties
+db.url=jdbc:mysql://localhost:3306/parkingDB
+db.user=root
+db.password=tu_password
+```
 
------
+### Persistencia JPA
 
-##  Buenas Prácticas Implementadas
+Editar `src/main/resources/META-INF/persistence.xml` si necesitas cambiar configuración de Hibernate.
 
-  - **Patrón de Diseño:** Implementación de DAO y MVC.
-  - **Manejo de Recursos:** Uso de *try-with-resources* en conexiones JDBC.
-  - **Seguridad Básica:** Validaciones en formularios y control de errores en Servlets.
-  - **Mantenibilidad:** Código limpio, con comentarios relevantes y separación de lógica.
+### Puerto del Servidor
 
------
+En `pom.xml`, sección del plugin Jetty:
 
-## Notas del Autor
+```xml
+<httpConnector>
+    <port>9090</port>  <!-- Cambiar aquí -->
+</httpConnector>
+```
 
-  - **Credenciales:** Para un entorno de producción, se recomienda encarecidamente usar variables de entorno o archivos de configuración externos para las credenciales de la base de datos, en lugar de codificarlas directamente.
-  - **Proyecto académico:** Sistema de Gestión de Parqueadero (Java - Maven - MySQL)
-  - **Autor:** Kevin David
-  - **Versión:** 1.0
-  - **Licencia:** MIT
+---
+
+## 🧪 Testing
+
+### Probar Health Check
+
+```bash
+curl http://localhost:9090/SistemaParqueadero/health
+```
+
+### Probar API con curl
+
+```bash
+# GET - Listar vehículos
+curl http://localhost:9090/SistemaParqueadero/api/vehiculos
+
+# POST - Registrar vehículo
+curl -X POST http://localhost:9090/SistemaParqueadero/api/vehiculos \
+  -d "placa=TEST123&tipo=Carro"
+
+# DELETE - Eliminar vehículo
+curl -X DELETE "http://localhost:9090/SistemaParqueadero/api/vehiculos?placa=TEST123"
+```
+
+---
+
+## 🔐 CORS
+
+El backend tiene CORS habilitado para desarrollo. En producción, editar `CORSFilter.java`:
+
+```java
+// Cambiar esto:
+res.setHeader("Access-Control-Allow-Origin", "*");
+
+// Por esto:
+res.setHeader("Access-Control-Allow-Origin", "https://tu-frontend.com");
+```
+
+---
+
+## 📚 Documentación
+
+- **OpenAPI JSON**: `http://localhost:9090/SistemaParqueadero/openapi.json`
+- **Health Check**: `http://localhost:9090/SistemaParqueadero/health`
+
+---
+
+## 🏗️ Arquitectura
+
+### Patrón de Capas
+
+```
+┌─────────────────────────────────┐
+│   Servlet (Controller Layer)    │ ← API REST Endpoints
+├─────────────────────────────────┤
+│     Service (Business Logic)    │ ← Lógica de negocio
+├─────────────────────────────────┤
+│   Repository (Data Access)      │ ← JPA/Hibernate
+├─────────────────────────────────┤
+│    Entity (Domain Models)       │ ← Modelos de dominio
+└─────────────────────────────────┘
+```
+
+### Principios Aplicados
+
+- **SOLID**: Responsabilidad única, abierto/cerrado, etc.
+- **Clean Code**: Nombres descriptivos, funciones cortas
+- **DRY**: No repetir código (uso de mappers)
+- **Repository Pattern**: Abstracción de acceso a datos
+- **DTO Pattern**: Separación de modelo interno y API
+
+---
+
+## 🐛 Troubleshooting
+
+### Error: No se puede conectar a MySQL
+
+```
+Verificar:
+1. MySQL está corriendo: systemctl status mysql
+2. Credenciales en application.properties
+3. Base de datos existe: mysql -e "SHOW DATABASES;"
+```
+
+### Error: Puerto 9090 en uso
+
+```bash
+# Ver qué proceso usa el puerto
+lsof -i :9090
+
+# Cambiar puerto en pom.xml o matar proceso
+kill -9 <PID>
+```
+
+### Error: Hibernate/JPA
+
+```
+Verificar:
+1. persistence.xml tiene las credenciales correctas
+2. Entidades tienen @Entity
+3. Revisar logs en consola
+```
+
+---
+
+## 📦 Despliegue
+
+### Desarrollo (Jetty)
+
+```bash
+mvn jetty:run
+```
+
+### Producción (Tomcat)
+
+```bash
+# 1. Compilar WAR
+mvn clean package
+
+# 2. Copiar a Tomcat
+cp target/SistemaParqueadero.war $TOMCAT_HOME/webapps/
+
+# 3. Reiniciar Tomcat
+$TOMCAT_HOME/bin/shutdown.sh
+$TOMCAT_HOME/bin/startup.sh
+```
+
+---
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crear rama: `git checkout -b feature/nueva-funcionalidad`
+3. Commit: `git commit -m 'Agregar nueva funcionalidad'`
+4. Push: `git push origin feature/nueva-funcionalidad`
+5. Pull Request
+
+---
+
+## 📄 Licencia
+
+MIT License - Ver archivo LICENSE
+
+---
+
+## 👨‍💻 Autor
+
+**Kevin David**  
+Proyecto Académico - Sistema de Gestión de Parqueadero  
+Versión: 2.0 (Backend Separado)
+
+---
+
+## 🔗 Enlaces
+
+- **Frontend Web**: [SistemaParqueaderoFrontendWeb](../SistemaParqueaderoFrontendWeb)
+- **Documentación API**: `http://localhost:9090/SistemaParqueadero/api-docs`

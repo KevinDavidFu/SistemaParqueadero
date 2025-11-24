@@ -2,15 +2,11 @@ package com.example.parking.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.parking.model.Vehiculo;
-import com.example.parking.service.ServicioTarifa;
-import com.example.parking.service.ServicioVehiculo;
+import com.example.parking.service.VehiculoService;
+import com.example.parking.service.VehiculoService.CobroResultDTO;
 import com.google.gson.Gson;
 
 import jakarta.servlet.ServletException;
@@ -18,17 +14,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 public class CobroServlet extends HttpServlet {
 
-    private ServicioVehiculo servicioVehiculo;
-    private ServicioTarifa servicioTarifa;
+    private VehiculoService servicioVehiculo;
     private Gson gson;
 
     @Override
     public void init() throws ServletException {
-        servicioVehiculo = new ServicioVehiculo();
-        servicioTarifa = new ServicioTarifa();
+        servicioVehiculo = new VehiculoService();
         gson = new Gson();
     }
 
@@ -38,9 +31,11 @@ public class CobroServlet extends HttpServlet {
 
         response.setContentType("application/json;charset=UTF-8");
         String placa = request.getParameter("placa");
+
         Map<String, Object> result = new HashMap<>();
-        
+
         try (PrintWriter out = response.getWriter()) {
+
             if (placa == null || placa.trim().isEmpty()) {
                 result.put("success", false);
                 result.put("message", "La placa es requerida");
@@ -48,15 +43,19 @@ public class CobroServlet extends HttpServlet {
                 return;
             }
 
-            Vehiculo vehiculo = servicioVehiculo.buscarVehiculo(placa);
+            // Buscar vehículo por placa
+            var vehiculoOpt = servicioVehiculo.buscarPorPlaca(placa);
 
-            if (vehiculo == null) {
+            if (vehiculoOpt.isEmpty()) {
                 result.put("success", false);
                 result.put("message", "Vehículo no encontrado");
                 out.print(gson.toJson(result));
                 return;
             }
 
+            var vehiculo = vehiculoOpt.get();
+
+            
             if (!vehiculo.isActivo()) {
                 result.put("success", false);
                 result.put("message", "Este vehículo ya tiene registrada su salida");
@@ -64,39 +63,22 @@ public class CobroServlet extends HttpServlet {
                 return;
             }
 
-            double precioPorHora = servicioTarifa.obtenerPrecioPorTipo(vehiculo.getTipo());
-            
-            if (precioPorHora == 0.0) {
-                result.put("success", false);
-                result.put("message", "No se encontró tarifa para: " + vehiculo.getTipo());
-                out.print(gson.toJson(result));
-                return;
-            }
+            // Registrar salida
+            CobroResultDTO cobro = servicioVehiculo.registrarSalida(placa);
 
-            Duration duracion = Duration.between(vehiculo.getIngreso(), LocalDateTime.now());
-            double horas = duracion.toMinutes() / 60.0;
-            if (horas < 1.0) horas = 1.0;
-            
-            double totalPagar = Math.round(horas * precioPorHora * 100.0) / 100.0;
+            result.put("success", true);
+            result.put("message", "Cobro realizado exitosamente");
+            result.put("placa", cobro.getPlaca());
+            result.put("horas", cobro.getHoras());
+            result.put("precioPorHora", cobro.getPrecioPorHora());
+            result.put("total", cobro.getTotal());
+            result.put("ingreso", cobro.getIngreso().toString());
+            result.put("salida", cobro.getSalida().toString());
 
-            boolean actualizado = servicioVehiculo.registrarSalida(placa, totalPagar);
-
-            if (actualizado) {
-                result.put("success", true);
-                result.put("message", "Cobro realizado exitosamente");
-                result.put("total", totalPagar);
-                result.put("horas", Math.round(horas * 100.0) / 100.0);
-                result.put("precioPorHora", precioPorHora);
-                result.put("vehiculo", vehiculo.getPlaca());
-            } else {
-                result.put("success", false);
-                result.put("message", "Error al actualizar el registro");
-            }
-            
             out.print(gson.toJson(result));
 
-        } catch (SQLException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             result.put("success", false);
             result.put("message", "Error: " + e.getMessage());
             response.getWriter().print(gson.toJson(result));

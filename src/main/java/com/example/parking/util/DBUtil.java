@@ -7,48 +7,57 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+@SuppressWarnings("CallToPrintStackTrace")
 public class DBUtil {
-    private static String URL;
-    private static String USER;
-    private static String PASSWORD;
+
+    private static final String URL;
+    private static final String USER;
+    private static final String PASSWORD;
 
     static {
+        String urlTemp = null;
+        String userTemp = null;
+        String passwordTemp = null;
+
         try {
             Properties prop = new Properties();
-            
+
             try (InputStream input = DBUtil.class.getClassLoader()
                     .getResourceAsStream("application.properties")) {
-                
+
                 if (input != null) {
                     prop.load(input);
-                    URL = prop.getProperty("db.url");
-                    USER = prop.getProperty("db.user");
-                    PASSWORD = prop.getProperty("db.password");
-                    
+                    urlTemp = prop.getProperty("db.url");
+                    userTemp = prop.getProperty("db.user");
+                    passwordTemp = prop.getProperty("db.password");
+
                     System.out.println("[DBUtil] Configuración cargada desde application.properties");
-                    System.out.println("[DBUtil] URL: " + URL);
-                    System.out.println("[DBUtil] USER: " + USER);
                 } else {
                     System.err.println("[DBUtil] application.properties NO ENCONTRADO");
-                    URL = "jdbc:mysql://localhost:3306/parkingDB";
-                    USER = "root";
-                    PASSWORD = "";
+                    urlTemp = "jdbc:mysql://localhost:3306/parkingDB";
+                    userTemp = "root";
+                    passwordTemp = "";
                 }
+
             } catch (IOException e) {
                 System.err.println("[DBUtil] Error al leer application.properties: " + e.getMessage());
-                URL = "jdbc:mysql://localhost:3306/parkingDB";
-                USER = "root";
-                PASSWORD = "";
+                urlTemp = "jdbc:mysql://localhost:3306/parkingDB";
+                userTemp = "root";
+                passwordTemp = "";
             }
-            
+
             Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("[DBUtil] Driver MySQL cargado correctamente");
-            
+
         } catch (ClassNotFoundException e) {
             System.err.println("[DBUtil] ERROR: Driver de MySQL NO encontrado");
             e.printStackTrace();
             throw new RuntimeException("Error: Driver de MySQL no encontrado", e);
         }
+
+        URL = urlTemp;
+        USER = userTemp;
+        PASSWORD = passwordTemp;
     }
 
     public static Connection getConnection() throws SQLException {
@@ -65,14 +74,11 @@ public class DBUtil {
             throw e;
         }
     }
-    
+
     public static boolean testConnection() {
         try (Connection conn = getConnection()) {
-            boolean isValid = conn != null && !conn.isClosed();
-            System.out.println("[DBUtil] Test de conexión: " + (isValid ? "OK" : "FALLIDO"));
-            return isValid;
+            return conn != null && !conn.isClosed();
         } catch (SQLException e) {
-            System.err.println("[DBUtil] Test de conexión FALLIDO: " + e.getMessage());
             return false;
         }
     }

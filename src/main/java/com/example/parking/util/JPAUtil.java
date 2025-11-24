@@ -3,7 +3,7 @@ package com.example.parking.util;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-
+@SuppressWarnings("CallToPrintStackTrace")
 /**
  * Utilidad para gestionar el EntityManagerFactory y EntityManager de JPA
  */

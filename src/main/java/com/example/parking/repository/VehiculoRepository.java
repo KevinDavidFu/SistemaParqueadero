@@ -6,7 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
-
+@SuppressWarnings("ConvertToTryWithResources")
 public class VehiculoRepository {
     
     public VehiculoEntity save(VehiculoEntity vehiculo) {
