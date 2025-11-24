@@ -5,6 +5,9 @@ import java.time.format.DateTimeFormatter;
 import com.example.parking.dto.TarifaDTO;
 import com.example.parking.entity.TarifaEntity;
 
+/**
+ * Mapper para convertir entre TarifaEntity y TarifaDTO
+ */
 public class TarifaMapper {
     
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
