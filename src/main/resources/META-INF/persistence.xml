@@ -7,14 +7,25 @@
         <class>com.example.parking.entity.VehiculoEntity</class>
         <class>com.example.parking.entity.HistorialEntity</class>
         <properties>
+            <!-- IMPORTANTE: Estas propiedades se sobrescriben desde application.properties -->
+            <!-- No colocar credenciales aquí, usar DBUtil.java para cargarlas -->
+            
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/parkingDB"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
-            <property name="jakarta.persistence.jdbc.password" value="KevDa#120038#_"/>
+            <property name="jakarta.persistence.jdbc.password" value=""/>
+            
+            <!-- Hibernate Settings -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
             <property name="hibernate.hbm2ddl.auto" value="none"/>
-            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="true"/>
+            
+            <!-- Performance Settings -->
+            <property name="hibernate.connection.pool_size" value="10"/>
+            <property name="hibernate.jdbc.batch_size" value="20"/>
+            <property name="hibernate.order_inserts" value="true"/>
+            <property name="hibernate.order_updates" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>
