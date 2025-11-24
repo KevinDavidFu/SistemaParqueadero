@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal; // <--- IMPORT AÑADIDO
 
 @Entity
 @Table(name = "Cliente")
@@ -30,8 +31,9 @@ public class ClienteEntity {
     @Column(name = "tipo_cliente", nullable = false, length = 20)
     private TipoCliente tipoCliente = TipoCliente.Eventual;
 
+    // CAMBIO CLAVE: Se usa BigDecimal para poder usar 'scale' y 'precision'.
     @Column(precision = 5, scale = 2, nullable = false)
-    private Double descuento = 0.0;
+    private BigDecimal descuento = BigDecimal.ZERO; // <--- CORREGIDO: Usando BigDecimal
 
     @Column(name = "creado_en", updatable = false)
     private LocalDateTime creadoEn;
@@ -39,7 +41,7 @@ public class ClienteEntity {
     @Column(name = "actualizado_en")
     private LocalDateTime actualizadoEn;
 
-    @JsonIgnore // ⚠ evita recursión infinita al mostrar JSON
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<VehiculoEntity> vehiculos = new ArrayList<>();
 
@@ -47,7 +49,7 @@ public class ClienteEntity {
     protected void onCreate() {
         creadoEn = LocalDateTime.now();
         actualizadoEn = LocalDateTime.now();
-        if (descuento == null) descuento = 0.0;
+        if (descuento == null) descuento = BigDecimal.ZERO; // Ajuste para BigDecimal
         if (tipoCliente == null) tipoCliente = TipoCliente.Eventual;
     }
 
@@ -62,7 +64,10 @@ public class ClienteEntity {
 
     public ClienteEntity() {}
 
-    // GETTERS Y SETTERS
+    // -------------------------------------------------------------------------
+    // GETTERS Y SETTERS CORREGIDOS
+    // -------------------------------------------------------------------------
+    
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -81,8 +86,8 @@ public class ClienteEntity {
     public TipoCliente getTipoCliente() { return tipoCliente; }
     public void setTipoCliente(TipoCliente tipoCliente) { this.tipoCliente = tipoCliente; }
 
-    public Double getDescuento() { return descuento; }
-    public void setDescuento(Double descuento) { this.descuento = descuento; }
+    public BigDecimal getDescuento() { return descuento; } // <--- CORREGIDO
+    public void setDescuento(BigDecimal descuento) { this.descuento = descuento; } // <--- CORREGIDO
 
     public LocalDateTime getCreadoEn() { return creadoEn; }
     public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
