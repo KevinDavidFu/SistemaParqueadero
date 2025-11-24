@@ -1,8 +1,9 @@
 package com.example.parking.mapper;
 
+import java.math.BigDecimal;
+
 import com.example.parking.dto.ClienteDTO;
 import com.example.parking.entity.ClienteEntity;
-import java.math.BigDecimal;
 
 /**
  * Mapper para convertir entre ClienteEntity y ClienteDTO
@@ -15,11 +16,7 @@ public class ClienteMapper {
     public static ClienteDTO toDTO(ClienteEntity entity) {
         if (entity == null) return null;
         
-        // Convertir BigDecimal a Double para el DTO
-        Double descuentoDouble = entity.getDescuento() != null 
-            ? entity.getDescuento().doubleValue() 
-            : 0.0;
-        
+        // El DTO espera BigDecimal, no Double
         return new ClienteDTO(
             entity.getId(),
             entity.getNombre(),
@@ -27,7 +24,7 @@ public class ClienteMapper {
             entity.getTelefono(),
             entity.getEmail(),
             entity.getTipoCliente() != null ? entity.getTipoCliente().name() : "Eventual",
-            descuentoDouble
+            entity.getDescuento() != null ? entity.getDescuento() : BigDecimal.ZERO
         );
     }
     
@@ -53,9 +50,9 @@ public class ClienteMapper {
             }
         }
         
-        // Convertir Double a BigDecimal
+        // El DTO ya tiene BigDecimal, asignarlo directamente
         if (dto.getDescuento() != null) {
-            entity.setDescuento(BigDecimal.valueOf(dto.getDescuento()));
+            entity.setDescuento(dto.getDescuento());
         } else {
             entity.setDescuento(BigDecimal.ZERO);
         }
