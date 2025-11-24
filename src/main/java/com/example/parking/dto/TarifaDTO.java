@@ -2,16 +2,19 @@ package com.example.parking.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+/**
+ * DTO para transferencia de datos de Tarifa
+ */
 @Schema(description = "Objeto de transferencia de datos para Tarifa")
 public class TarifaDTO {
     
     @Schema(description = "ID único de la tarifa", example = "1")
     private Integer id;
     
-    @Schema(description = "Tipo de vehículo", example = "Carro", required = true)
+    @Schema(description = "Tipo de vehículo", example = "Carro", requiredMode = Schema.RequiredMode.REQUIRED)
     private String tipo;
     
-    @Schema(description = "Precio por hora en COP", example = "5000.0", required = true)
+    @Schema(description = "Precio por hora en COP", example = "5000.0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Double precioPorHora;
     
     @Schema(description = "Estado de la tarifa", example = "true")
@@ -20,9 +23,10 @@ public class TarifaDTO {
     @Schema(description = "Fecha de creación", example = "2025-01-15T10:30:00")
     private String creadoEn;
     
-    // Constructores
+    // Constructor vacío
     public TarifaDTO() {}
     
+    // Constructor completo
     public TarifaDTO(Integer id, String tipo, Double precioPorHora, Boolean activa, String creadoEn) {
         this.id = id;
         this.tipo = tipo;
