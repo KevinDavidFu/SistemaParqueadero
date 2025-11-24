@@ -2,12 +2,23 @@ package com.example.parking.mapper;
 
 import com.example.parking.dto.ClienteDTO;
 import com.example.parking.entity.ClienteEntity;
-import java.math.BigDecimal; // Importamos para referencia, aunque no es estrictamente necesario si ya está en la Entity/DTO
+import java.math.BigDecimal;
 
+/**
+ * Mapper para convertir entre ClienteEntity y ClienteDTO
+ */
 public class ClienteMapper {
     
+    /**
+     * Convierte ClienteEntity a ClienteDTO
+     */
     public static ClienteDTO toDTO(ClienteEntity entity) {
         if (entity == null) return null;
+        
+        // Convertir BigDecimal a Double para el DTO
+        Double descuentoDouble = entity.getDescuento() != null 
+            ? entity.getDescuento().doubleValue() 
+            : 0.0;
         
         return new ClienteDTO(
             entity.getId(),
@@ -15,12 +26,14 @@ public class ClienteMapper {
             entity.getDocumento(),
             entity.getTelefono(),
             entity.getEmail(),
-            entity.getTipoCliente() != null ? entity.getTipoCliente().name() : null,
-            // Línea 18: Ambos getDescuento() deben devolver BigDecimal
-            entity.getDescuento() 
+            entity.getTipoCliente() != null ? entity.getTipoCliente().name() : "Eventual",
+            descuentoDouble
         );
     }
     
+    /**
+     * Convierte ClienteDTO a ClienteEntity
+     */
     public static ClienteEntity toEntity(ClienteDTO dto) {
         if (dto == null) return null;
         
@@ -31,12 +44,22 @@ public class ClienteMapper {
         entity.setTelefono(dto.getTelefono());
         entity.setEmail(dto.getEmail());
         
-        if (dto.getTipoCliente() != null) {
-            entity.setTipoCliente(ClienteEntity.TipoCliente.valueOf(dto.getTipoCliente()));
+        // Convertir String a Enum
+        if (dto.getTipoCliente() != null && !dto.getTipoCliente().isEmpty()) {
+            try {
+                entity.setTipoCliente(ClienteEntity.TipoCliente.valueOf(dto.getTipoCliente()));
+            } catch (IllegalArgumentException e) {
+                entity.setTipoCliente(ClienteEntity.TipoCliente.Eventual);
+            }
         }
         
-        // Línea 36: Ambos setDescuento() y getDescuento() deben usar BigDecimal
-        entity.setDescuento(dto.getDescuento());
+        // Convertir Double a BigDecimal
+        if (dto.getDescuento() != null) {
+            entity.setDescuento(BigDecimal.valueOf(dto.getDescuento()));
+        } else {
+            entity.setDescuento(BigDecimal.ZERO);
+        }
+        
         return entity;
     }
 }
