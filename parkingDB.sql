@@ -1,8 +1,8 @@
-CREATE DATABASE parkingDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS parkingDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE parkingDB;
 
 -- Tabla Tarifa
-CREATE TABLE Tarifa (
+CREATE TABLE IF NOT EXISTS Tarifa (
   id INT AUTO_INCREMENT PRIMARY KEY,
   tipo VARCHAR(50) NOT NULL UNIQUE,
   precio_por_hora DECIMAL(10,2) NOT NULL CHECK (precio_por_hora >= 0),
@@ -12,8 +12,8 @@ CREATE TABLE Tarifa (
   INDEX idx_tipo (tipo)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tabla Cliente (NUEVA - para tener más de 2 tablas)
-CREATE TABLE Cliente (
+-- Tabla Cliente
+CREATE TABLE IF NOT EXISTS Cliente (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(100) NOT NULL,
   documento VARCHAR(20) NOT NULL UNIQUE,
@@ -27,8 +27,8 @@ CREATE TABLE Cliente (
   INDEX idx_tipo_cliente (tipo_cliente)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tabla Vehiculo (MEJORADA con FK a Cliente)
-CREATE TABLE Vehiculo (
+-- Tabla Vehiculo
+CREATE TABLE IF NOT EXISTS Vehiculo (
   id INT AUTO_INCREMENT PRIMARY KEY,
   placa VARCHAR(15) NOT NULL UNIQUE,
   modelo VARCHAR(100),
@@ -48,8 +48,8 @@ CREATE TABLE Vehiculo (
   FOREIGN KEY (cliente_id) REFERENCES Cliente(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tabla Historial (NUEVA - para tener más de 2 tablas)
-CREATE TABLE Historial (
+-- Tabla Historial
+CREATE TABLE IF NOT EXISTS Historial (
   id INT AUTO_INCREMENT PRIMARY KEY,
   vehiculo_id INT NOT NULL,
   cliente_id INT,
@@ -69,7 +69,7 @@ CREATE TABLE Historial (
   FOREIGN KEY (cliente_id) REFERENCES Cliente(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insertar datos iniciales
+-- Datos iniciales
 INSERT INTO Tarifa (tipo, precio_por_hora, activa) VALUES 
 ('Carro', 5000.00, TRUE),
 ('Moto', 3000.00, TRUE),
@@ -78,16 +78,16 @@ INSERT INTO Tarifa (tipo, precio_por_hora, activa) VALUES
 
 INSERT INTO Cliente (nombre, documento, telefono, email, tipo_cliente, descuento) VALUES
 ('Juan Pérez', '123456789', '3001234567', 'juan@example.com', 'Regular', 10.00),
-('María González', '987654321', '3009876543', 'maria@example.com', 'VIP', 20.00),
-('Carlos Rodríguez', '456789123', '3004567891', 'carlos@example.com', 'Eventual', 0.00);
+('María González', '987654321', '3009876543', 'VIP', 20.00),
+('Carlos Rodríguez', '456789123', '3004567891', 'Eventual', 0.00);
 
 INSERT INTO Vehiculo (placa, modelo, tipo, cliente_id, ingreso, activo) VALUES
 ('ABC123', 'Toyota Corolla 2020', 'Carro', 1, NOW() - INTERVAL 2 HOUR, TRUE),
 ('XYZ789', 'Honda CBR 600', 'Moto', 2, NOW() - INTERVAL 1 HOUR, TRUE),
 ('DEF456', 'Trek Mountain Bike', 'Bicicleta', 3, NOW() - INTERVAL 30 MINUTE, TRUE);
 
--- Vista útil para reportes
-CREATE VIEW vista_vehiculos_activos AS
+-- Vista para reportes
+CREATE OR REPLACE VIEW vista_vehiculos_activos AS
 SELECT 
     v.id,
     v.placa,
@@ -104,5 +104,3 @@ FROM Vehiculo v
 LEFT JOIN Cliente c ON v.cliente_id = c.id
 LEFT JOIN Tarifa t ON v.tipo = t.tipo
 WHERE v.activo = TRUE;
-
-SELECT 'Base de datos creada exitosamente con 4 tablas relacionadas' as Mensaje;
