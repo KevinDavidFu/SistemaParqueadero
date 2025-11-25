@@ -39,27 +39,15 @@ public class VehiculoAPIServlet extends HttpServlet {
         try {
             vehiculoRepository = new VehiculoRepository();
             gson = new Gson();
-            System.out.println("[VehiculoAPIServlet] Servlet inicializado correctamente con VehiculoRepository");
+            System.out.println("[VehiculoAPIServlet] Servlet inicializado correctamente");
         } catch (Exception e) {
             System.err.println("[VehiculoAPIServlet] ERROR al inicializar: " + e.getMessage());
-            System.err.println("[Stack Trace]: " + e);
+            e.printStackTrace();
             throw new ServletException("Error al inicializar VehiculoAPIServlet", e);
         }
     }
 
     @Override
-    @Operation(
-        summary = "Listar todos los vehículos",
-        description = "Obtiene la lista completa de vehículos registrados en el sistema",
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "Lista de vehículos obtenida exitosamente",
-                content = @Content(schema = @Schema(implementation = VehiculoDTO.class))
-            ),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-        }
-    )
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -68,8 +56,47 @@ public class VehiculoAPIServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         try {
-            System.out.println("[VehiculoAPIServlet] GET - Obteniendo vehículos");
+            // NUEVO: Soporte para obtener por ID o placa
+            String idParam = request.getParameter("id");
+            String placaParam = request.getParameter("placa");
             
+            if (idParam != null) {
+                // Obtener por ID
+                Integer id = Integer.parseInt(idParam);
+                Optional<VehiculoEntity> vehiculo = vehiculoRepository.findById(id);
+                
+                Map<String, Object> result = new HashMap<>();
+                if (vehiculo.isPresent()) {
+                    result.put("success", true);
+                    result.put("data", VehiculoEntityMapper.toDTO(vehiculo.get()));
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    result.put("success", false);
+                    result.put("message", "Vehículo no encontrado");
+                }
+                out.print(gson.toJson(result));
+                return;
+            }
+            
+            if (placaParam != null) {
+                // Obtener por placa
+                Optional<VehiculoEntity> vehiculo = vehiculoRepository.findByPlaca(placaParam);
+                
+                Map<String, Object> result = new HashMap<>();
+                if (vehiculo.isPresent()) {
+                    result.put("success", true);
+                    result.put("data", VehiculoEntityMapper.toDTO(vehiculo.get()));
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    result.put("success", false);
+                    result.put("message", "Vehículo no encontrado");
+                }
+                out.print(gson.toJson(result));
+                return;
+            }
+            
+            // Listar todos
+            System.out.println("[VehiculoAPIServlet] GET - Obteniendo todos los vehículos");
             List<VehiculoEntity> vehiculos = vehiculoRepository.findAll();
             List<VehiculoDTO> vehiculosDTO = vehiculos.stream()
                     .map(VehiculoEntityMapper::toDTO)
@@ -80,39 +107,29 @@ public class VehiculoAPIServlet extends HttpServlet {
             result.put("data", vehiculosDTO);
             result.put("count", vehiculosDTO.size());
             
-            String json = gson.toJson(result);
-            System.out.println("[VehiculoAPIServlet] Respuesta con " + vehiculosDTO.size() + " vehículos");
-            out.print(json);
-            out.flush();
+            out.print(gson.toJson(result));
             
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "ID inválido");
+            out.print(gson.toJson(error));
         } catch (Exception e) {
             System.err.println("[VehiculoAPIServlet] ERROR en GET: " + e.getMessage());
-            System.err.println("[Stack Trace]: " + e);
+            e.printStackTrace();
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Error al obtener vehículos: " + e.getMessage());
             out.print(gson.toJson(error));
+        } finally {
             out.flush();
         }
     }
 
     @Override
-    @Operation(
-        summary = "Registrar nuevo vehículo",
-        description = "Registra la entrada de un nuevo vehículo al parqueadero",
-        parameters = {
-            @Parameter(name = "placa", description = "Placa del vehículo", required = true),
-            @Parameter(name = "modelo", description = "Modelo del vehículo"),
-            @Parameter(name = "tipo", description = "Tipo de vehículo (Carro, Moto, Bicicleta)", required = true)
-        },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Vehículo registrado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-        }
-    )
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -123,8 +140,6 @@ public class VehiculoAPIServlet extends HttpServlet {
         String modelo = request.getParameter("modelo");
         String tipo = request.getParameter("tipo");
         
-        System.out.println("[VehiculoAPIServlet] POST - placa: " + placa + ", tipo: " + tipo);
-
         Map<String, Object> result = new HashMap<>();
         
         try {
@@ -153,20 +168,16 @@ public class VehiculoAPIServlet extends HttpServlet {
 
             VehiculoEntity saved = vehiculoRepository.save(vehiculo);
 
-            if (saved != null) {
-                result.put("success", true);
-                result.put("message", "Vehículo registrado correctamente");
-                result.put("data", VehiculoEntityMapper.toDTO(saved));
-            } else {
-                result.put("success", false);
-                result.put("message", "No se pudo registrar el vehículo");
-            }
+            result.put("success", true);
+            result.put("message", "Vehículo registrado correctamente");
+            result.put("data", VehiculoEntityMapper.toDTO(saved));
+            
             out.print(gson.toJson(result));
             out.flush();
             
         } catch (Exception e) {
             System.err.println("[VehiculoAPIServlet] ERROR en POST: " + e.getMessage());
-            System.err.println("[Stack Trace]: " + e);
+            e.printStackTrace();
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             result.put("success", false);
@@ -176,20 +187,79 @@ public class VehiculoAPIServlet extends HttpServlet {
         }
     }
 
+    // NUEVO: Método doPut para actualizar
     @Override
-    @Operation(
-        summary = "Eliminar vehículo",
-        description = "Elimina un vehículo del sistema por su placa",
-        parameters = {
-            @Parameter(name = "placa", description = "Placa del vehículo a eliminar", required = true)
-        },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Vehículo eliminado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Placa no proporcionada"),
-            @ApiResponse(responseCode = "404", description = "Vehículo no encontrado"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        response.setContentType("application/json;charset=UTF-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        PrintWriter out = response.getWriter();
+        
+        String idParam = request.getParameter("id");
+        String modelo = request.getParameter("modelo");
+        String tipo = request.getParameter("tipo");
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            if (idParam == null || idParam.trim().isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                result.put("success", false);
+                result.put("message", "El ID es requerido");
+                out.print(gson.toJson(result));
+                return;
+            }
+            
+            Integer id = Integer.parseInt(idParam);
+            Optional<VehiculoEntity> vehiculoOpt = vehiculoRepository.findById(id);
+            
+            if (vehiculoOpt.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                result.put("success", false);
+                result.put("message", "Vehículo no encontrado");
+                out.print(gson.toJson(result));
+                return;
+            }
+            
+            VehiculoEntity vehiculo = vehiculoOpt.get();
+            
+            // Actualizar solo los campos proporcionados
+            if (modelo != null && !modelo.trim().isEmpty()) {
+                vehiculo.setModelo(modelo.trim());
+            }
+            
+            if (tipo != null && !tipo.trim().isEmpty()) {
+                vehiculo.setTipo(tipo.trim());
+            }
+            
+            VehiculoEntity updated = vehiculoRepository.save(vehiculo);
+            
+            result.put("success", true);
+            result.put("message", "Vehículo actualizado correctamente");
+            result.put("data", VehiculoEntityMapper.toDTO(updated));
+            
+            out.print(gson.toJson(result));
+            
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            result.put("success", false);
+            result.put("message", "ID inválido");
+            out.print(gson.toJson(result));
+        } catch (Exception e) {
+            System.err.println("[VehiculoAPIServlet] ERROR en PUT: " + e.getMessage());
+            e.printStackTrace();
+            
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            result.put("success", false);
+            result.put("message", "Error al actualizar vehículo: " + e.getMessage());
+            out.print(gson.toJson(result));
+        } finally {
+            out.flush();
         }
-    )
+    }
+
+    @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -197,7 +267,6 @@ public class VehiculoAPIServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         String placa = request.getParameter("placa");
-        System.out.println("[VehiculoAPIServlet] DELETE - placa: " + placa);
         
         Map<String, Object> result = new HashMap<>();
         
@@ -225,7 +294,7 @@ public class VehiculoAPIServlet extends HttpServlet {
             
         } catch (Exception e) {
             System.err.println("[VehiculoAPIServlet] ERROR en DELETE: " + e.getMessage());
-            System.err.println("[Stack Trace]: " + e);
+            e.printStackTrace();
             
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             result.put("success", false);
@@ -233,5 +302,14 @@ public class VehiculoAPIServlet extends HttpServlet {
             out.print(gson.toJson(result));
             out.flush();
         }
+    }
+    
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }
