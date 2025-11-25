@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
+
 @SuppressWarnings("ConvertToTryWithResources")
 public class VehiculoRepository {
     
@@ -25,6 +26,24 @@ public class VehiculoRepository {
                 em.getTransaction().rollback();
             }
             throw new RuntimeException("Error al guardar vehículo", e);
+        } finally {
+            em.close();
+        }
+    }
+    
+    // NUEVO: Método update explícito
+    public VehiculoEntity update(VehiculoEntity vehiculo) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            VehiculoEntity updated = em.merge(vehiculo);
+            em.getTransaction().commit();
+            return updated;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Error al actualizar vehículo", e);
         } finally {
             em.close();
         }

@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
+
 @SuppressWarnings("ConvertToTryWithResources")
 public class TarifaRepository {
     
@@ -25,6 +26,24 @@ public class TarifaRepository {
                 em.getTransaction().rollback();
             }
             throw new RuntimeException("Error al guardar tarifa", e);
+        } finally {
+            em.close();
+        }
+    }
+    
+    // NUEVO: Método update explícito
+    public TarifaEntity update(TarifaEntity tarifa) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            TarifaEntity updated = em.merge(tarifa);
+            em.getTransaction().commit();
+            return updated;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Error al actualizar tarifa", e);
         } finally {
             em.close();
         }
@@ -93,6 +112,27 @@ public class TarifaRepository {
                 em.getTransaction().rollback();
             }
             throw new RuntimeException("Error al eliminar tarifa", e);
+        } finally {
+            em.close();
+        }
+    }
+    
+    // NUEVO: Soft delete (marcar como inactiva)
+    public void softDelete(Integer id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            TarifaEntity tarifa = em.find(TarifaEntity.class, id);
+            if (tarifa != null) {
+                tarifa.setActiva(false);
+                em.merge(tarifa);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Error al desactivar tarifa", e);
         } finally {
             em.close();
         }

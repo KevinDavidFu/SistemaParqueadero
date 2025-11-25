@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
+
 @SuppressWarnings("ConvertToTryWithResources")
 public class ClienteRepository {
     
@@ -30,6 +31,24 @@ public class ClienteRepository {
         }
     }
     
+    // NUEVO: Método update explícito
+    public ClienteEntity update(ClienteEntity cliente) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            ClienteEntity updated = em.merge(cliente);
+            em.getTransaction().commit();
+            return updated;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Error al actualizar cliente", e);
+        } finally {
+            em.close();
+        }
+    }
+    
     public Optional<ClienteEntity> findById(Integer id) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
@@ -40,7 +59,6 @@ public class ClienteRepository {
         }
     }
     
-    @SuppressWarnings("ConvertToTryWithResources")
     public Optional<ClienteEntity> findByDocumento(String documento) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
