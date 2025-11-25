@@ -2,6 +2,7 @@ package com.example.parking.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 @SuppressWarnings("CallToPrintStackTrace")
 @WebServlet("/api/tarifas")
 public class TarifaAPIServlet extends HttpServlet {
@@ -28,7 +30,7 @@ public class TarifaAPIServlet extends HttpServlet {
         try {
             tarifaRepository = new TarifaRepository();
             gson = new Gson();
-            System.out.println("[TarifaAPIServlet] Servlet inicializado correctamente con TarifaRepository");
+            System.out.println("[TarifaAPIServlet] Servlet inicializado correctamente");
         } catch (Exception e) {
             System.err.println("[TarifaAPIServlet] ERROR al inicializar: " + e.getMessage());
             e.printStackTrace();
@@ -36,9 +38,6 @@ public class TarifaAPIServlet extends HttpServlet {
         }
     }
 
-    // ---------------------------------------------------------
-    // MÉTODO GET - LISTAR TARIFAS
-    // ---------------------------------------------------------
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -78,9 +77,6 @@ public class TarifaAPIServlet extends HttpServlet {
         }
     }
 
-    // ---------------------------------------------------------
-    // MÉTODO POST - REGISTRAR NUEVA TARIFA
-    // ---------------------------------------------------------
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -97,7 +93,6 @@ public class TarifaAPIServlet extends HttpServlet {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            // Validaciones básicas
             if (tipo == null || tipo.trim().isEmpty()) {
                 result.put("success", false);
                 result.put("message", "El tipo de vehículo es requerido");
@@ -114,8 +109,9 @@ public class TarifaAPIServlet extends HttpServlet {
                 return;
             }
 
-            double precio = Double.parseDouble(precioStr);
-            if (precio <= 0) {
+            // CORRECCIÓN: Convertir a BigDecimal
+            BigDecimal precio = new BigDecimal(precioStr);
+            if (precio.compareTo(BigDecimal.ZERO) <= 0) {
                 result.put("success", false);
                 result.put("message", "El precio debe ser mayor a 0");
                 out.print(gson.toJson(result));
@@ -123,7 +119,6 @@ public class TarifaAPIServlet extends HttpServlet {
                 return;
             }
 
-            // Crear y guardar entidad
             TarifaEntity tarifa = new TarifaEntity();
             tarifa.setTipo(tipo.trim());
             tarifa.setPrecioPorHora(precio);

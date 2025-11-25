@@ -1,6 +1,7 @@
 package com.example.parking.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
 
 @Schema(description = "Objeto de transferencia de datos para Vehículo")
 public class VehiculoDTO {
@@ -23,8 +24,9 @@ public class VehiculoDTO {
     @Schema(description = "Fecha y hora de salida", example = "2025-01-15T14:30:00")
     private String salida;
     
+    // CORRECCIÓN: Cambiar double a BigDecimal
     @Schema(description = "Total pagado por el servicio", example = "15000.00")
-    private double totalPagado;
+    private BigDecimal totalPagado;
     
     @Schema(description = "Estado del vehículo en el parqueadero", example = "true")
     private boolean activo;
@@ -32,7 +34,7 @@ public class VehiculoDTO {
     public VehiculoDTO() {}
 
     public VehiculoDTO(int id, String placa, String modelo, String tipo, String ingreso, 
-                       String salida, double totalPagado, boolean activo) {
+                       String salida, BigDecimal totalPagado, boolean activo) {
         this.id = id;
         this.placa = placa;
         this.modelo = modelo;
@@ -61,8 +63,8 @@ public class VehiculoDTO {
     public String getSalida() { return salida; }
     public void setSalida(String salida) { this.salida = salida; }
 
-    public double getTotalPagado() { return totalPagado; }
-    public void setTotalPagado(double totalPagado) { this.totalPagado = totalPagado; }
+    public BigDecimal getTotalPagado() { return totalPagado; }
+    public void setTotalPagado(BigDecimal totalPagado) { this.totalPagado = totalPagado; }
 
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }

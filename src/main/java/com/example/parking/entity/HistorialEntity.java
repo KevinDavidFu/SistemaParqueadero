@@ -1,6 +1,7 @@
 package com.example.parking.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,12 +12,10 @@ public class HistorialEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // FK vehiculo_id → Vehiculo.id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehiculo_id", nullable = false)
     private VehiculoEntity vehiculo;
 
-    // FK cliente_id → Cliente.id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     private ClienteEntity cliente;
@@ -27,17 +26,18 @@ public class HistorialEntity {
     @Column(name = "fecha_salida", nullable = false)
     private LocalDateTime fechaSalida;
 
-    @Column(name = "horas_totales", nullable = false, precision = 10, scale = 2)
-    private Double horasTotales;
+    // CORRECCIÓN: Cambiar Double a BigDecimal y remover scale/precision
+    @Column(name = "horas_totales", nullable = false)
+    private BigDecimal horasTotales;
 
-    @Column(name = "tarifa_aplicada", nullable = false, precision = 10, scale = 2)
-    private Double tarifaAplicada;
+    @Column(name = "tarifa_aplicada", nullable = false)
+    private BigDecimal tarifaAplicada;
 
-    @Column(name = "descuento_aplicado", precision = 5, scale = 2)
-    private Double descuentoAplicado = 0.0;
+    @Column(name = "descuento_aplicado")
+    private BigDecimal descuentoAplicado = BigDecimal.ZERO;
 
-    @Column(name = "total_cobrado", nullable = false, precision = 10, scale = 2)
-    private Double totalCobrado;
+    @Column(name = "total_cobrado", nullable = false)
+    private BigDecimal totalCobrado;
 
     @Column(name = "tipo_vehiculo", nullable = false, length = 50)
     private String tipoVehiculo;
@@ -51,11 +51,12 @@ public class HistorialEntity {
     @PrePersist
     protected void onCreate() {
         creadoEn = LocalDateTime.now();
+        if (descuentoAplicado == null) descuentoAplicado = BigDecimal.ZERO;
     }
 
     public HistorialEntity() {}
 
-    // Getters y Setters
+    // GETTERS Y SETTERS CORREGIDOS
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -71,17 +72,17 @@ public class HistorialEntity {
     public LocalDateTime getFechaSalida() { return fechaSalida; }
     public void setFechaSalida(LocalDateTime fechaSalida) { this.fechaSalida = fechaSalida; }
 
-    public Double getHorasTotales() { return horasTotales; }
-    public void setHorasTotales(Double horasTotales) { this.horasTotales = horasTotales; }
+    public BigDecimal getHorasTotales() { return horasTotales; }
+    public void setHorasTotales(BigDecimal horasTotales) { this.horasTotales = horasTotales; }
 
-    public Double getTarifaAplicada() { return tarifaAplicada; }
-    public void setTarifaAplicada(Double tarifaAplicada) { this.tarifaAplicada = tarifaAplicada; }
+    public BigDecimal getTarifaAplicada() { return tarifaAplicada; }
+    public void setTarifaAplicada(BigDecimal tarifaAplicada) { this.tarifaAplicada = tarifaAplicada; }
 
-    public Double getDescuentoAplicado() { return descuentoAplicado; }
-    public void setDescuentoAplicado(Double descuentoAplicado) { this.descuentoAplicado = descuentoAplicado; }
+    public BigDecimal getDescuentoAplicado() { return descuentoAplicado; }
+    public void setDescuentoAplicado(BigDecimal descuentoAplicado) { this.descuentoAplicado = descuentoAplicado; }
 
-    public Double getTotalCobrado() { return totalCobrado; }
-    public void setTotalCobrado(Double totalCobrado) { this.totalCobrado = totalCobrado; }
+    public BigDecimal getTotalCobrado() { return totalCobrado; }
+    public void setTotalCobrado(BigDecimal totalCobrado) { this.totalCobrado = totalCobrado; }
 
     public String getTipoVehiculo() { return tipoVehiculo; }
     public void setTipoVehiculo(String tipoVehiculo) { this.tipoVehiculo = tipoVehiculo; }

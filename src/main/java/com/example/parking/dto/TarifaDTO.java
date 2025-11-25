@@ -1,10 +1,8 @@
 package com.example.parking.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
 
-/**
- * DTO para transferencia de datos de Tarifa
- */
 @Schema(description = "Objeto de transferencia de datos para Tarifa")
 public class TarifaDTO {
     
@@ -14,8 +12,9 @@ public class TarifaDTO {
     @Schema(description = "Tipo de vehículo", example = "Carro", requiredMode = Schema.RequiredMode.REQUIRED)
     private String tipo;
     
-    @Schema(description = "Precio por hora en COP", example = "5000.0", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Double precioPorHora;
+    // CORRECCIÓN: Cambiar Double a BigDecimal
+    @Schema(description = "Precio por hora en COP", example = "5000.00", requiredMode = Schema.RequiredMode.REQUIRED)
+    private BigDecimal precioPorHora;
     
     @Schema(description = "Estado de la tarifa", example = "true")
     private Boolean activa;
@@ -23,11 +22,9 @@ public class TarifaDTO {
     @Schema(description = "Fecha de creación", example = "2025-01-15T10:30:00")
     private String creadoEn;
     
-    // Constructor vacío
     public TarifaDTO() {}
     
-    // Constructor completo
-    public TarifaDTO(Integer id, String tipo, Double precioPorHora, Boolean activa, String creadoEn) {
+    public TarifaDTO(Integer id, String tipo, BigDecimal precioPorHora, Boolean activa, String creadoEn) {
         this.id = id;
         this.tipo = tipo;
         this.precioPorHora = precioPorHora;
@@ -42,8 +39,8 @@ public class TarifaDTO {
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
     
-    public Double getPrecioPorHora() { return precioPorHora; }
-    public void setPrecioPorHora(Double precioPorHora) { this.precioPorHora = precioPorHora; }
+    public BigDecimal getPrecioPorHora() { return precioPorHora; }
+    public void setPrecioPorHora(BigDecimal precioPorHora) { this.precioPorHora = precioPorHora; }
     
     public Boolean getActiva() { return activa; }
     public void setActiva(Boolean activa) { this.activa = activa; }

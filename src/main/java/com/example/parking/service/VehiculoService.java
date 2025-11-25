@@ -1,5 +1,7 @@
 package com.example.parking.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,10 +15,6 @@ import com.example.parking.mapper.VehiculoEntityMapper;
 import com.example.parking.repository.TarifaRepository;
 import com.example.parking.repository.VehiculoRepository;
 
-/**
- * Servicio de negocio para gestión de vehículos
- * Contiene toda la lógica de negocio relacionada con vehículos
- */
 public class VehiculoService {
     
     private final VehiculoRepository vehiculoRepository;
@@ -27,9 +25,6 @@ public class VehiculoService {
         this.tarifaRepository = new TarifaRepository();
     }
     
-    /**
-     * Lista todos los vehículos
-     */
     public List<VehiculoDTO> listarTodos() {
         List<VehiculoEntity> vehiculos = vehiculoRepository.findAll();
         return vehiculos.stream()
@@ -37,9 +32,6 @@ public class VehiculoService {
                 .collect(Collectors.toList());
     }
     
-    /**
-     * Lista vehículos activos (en el parqueadero)
-     */
     public List<VehiculoDTO> listarActivos() {
         List<VehiculoEntity> vehiculos = vehiculoRepository.findByActivo(true);
         return vehiculos.stream()
@@ -47,48 +39,35 @@ public class VehiculoService {
                 .collect(Collectors.toList());
     }
     
-    /**
-     * Busca un vehículo por placa
-     */
     public Optional<VehiculoDTO> buscarPorPlaca(String placa) {
         return vehiculoRepository.findByPlaca(placa)
                 .map(VehiculoEntityMapper::toDTO);
     }
     
-    /**
-     * Registra la entrada de un vehículo
-     */
     public VehiculoDTO registrarEntrada(String placa, String modelo, String tipo, Integer clienteId) {
-        // Validar que el tipo de vehículo tenga tarifa
         Optional<TarifaEntity> tarifaOpt = tarifaRepository.findByTipo(tipo);
         if (tarifaOpt.isEmpty()) {
             throw new IllegalArgumentException("No existe tarifa para el tipo de vehículo: " + tipo);
         }
         
-        // Validar que la placa no esté ya registrada como activa
         Optional<VehiculoEntity> existente = vehiculoRepository.findByPlaca(placa);
         if (existente.isPresent() && existente.get().getActivo()) {
             throw new IllegalStateException("El vehículo ya está registrado en el parqueadero");
         }
         
-        // Crear nuevo vehículo
         VehiculoEntity vehiculo = new VehiculoEntity();
         vehiculo.setPlaca(placa.toUpperCase().trim());
         vehiculo.setModelo(modelo != null ? modelo.trim() : "");
         vehiculo.setTipo(tipo.trim());
         vehiculo.setIngreso(LocalDateTime.now());
         vehiculo.setActivo(true);
-        vehiculo.setTotalPagado(0.0);
+        vehiculo.setTotalPagado(BigDecimal.ZERO);
         
         VehiculoEntity saved = vehiculoRepository.save(vehiculo);
         return VehiculoEntityMapper.toDTO(saved);
     }
     
-    /**
-     * Registra la salida de un vehículo y calcula el cobro
-     */
     public CobroResultDTO registrarSalida(String placa) {
-        // Buscar vehículo
         Optional<VehiculoEntity> vehiculoOpt = vehiculoRepository.findByPlaca(placa);
         if (vehiculoOpt.isEmpty()) {
             throw new IllegalArgumentException("Vehículo no encontrado");
@@ -100,7 +79,6 @@ public class VehiculoService {
             throw new IllegalStateException("El vehículo ya tiene registrada su salida");
         }
         
-        // Obtener tarifa
         Optional<TarifaEntity> tarifaOpt = tarifaRepository.findByTipo(vehiculo.getTipo());
         if (tarifaOpt.isEmpty()) {
             throw new IllegalStateException("No se encontró tarifa para: " + vehiculo.getTipo());
@@ -108,17 +86,20 @@ public class VehiculoService {
         
         TarifaEntity tarifa = tarifaOpt.get();
         
-        // Calcular tiempo y costo
+        // Calcular tiempo y costo con BigDecimal
         LocalDateTime ahora = LocalDateTime.now();
         Duration duracion = Duration.between(vehiculo.getIngreso(), ahora);
-        double horas = duracion.toMinutes() / 60.0;
+        
+        BigDecimal horas = BigDecimal.valueOf(duracion.toMinutes())
+                .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
         
         // Mínimo 1 hora
-        if (horas < 1.0) {
-            horas = 1.0;
+        if (horas.compareTo(BigDecimal.ONE) < 0) {
+            horas = BigDecimal.ONE;
         }
         
-        double total = Math.round(horas * tarifa.getPrecioPorHora() * 100.0) / 100.0;
+        BigDecimal total = horas.multiply(tarifa.getPrecioPorHora())
+                .setScale(2, RoundingMode.HALF_UP);
         
         // Actualizar vehículo
         vehiculo.setSalida(ahora);
@@ -129,18 +110,15 @@ public class VehiculoService {
         // Retornar resultado
         CobroResultDTO resultado = new CobroResultDTO();
         resultado.setPlaca(placa);
-        resultado.setHoras(Math.round(horas * 100.0) / 100.0);
-        resultado.setPrecioPorHora(tarifa.getPrecioPorHora());
-        resultado.setTotal(total);
+        resultado.setHoras(horas.doubleValue());
+        resultado.setPrecioPorHora(tarifa.getPrecioPorHora().doubleValue());
+        resultado.setTotal(total.doubleValue());
         resultado.setIngreso(vehiculo.getIngreso());
         resultado.setSalida(ahora);
         
         return resultado;
     }
     
-    /**
-     * Elimina un vehículo por placa
-     */
     public boolean eliminar(String placa) {
         Optional<VehiculoEntity> vehiculo = vehiculoRepository.findByPlaca(placa);
         if (vehiculo.isPresent()) {
@@ -150,9 +128,6 @@ public class VehiculoService {
         return false;
     }
     
-    /**
-     * DTO para resultado de cobro
-     */
     public static class CobroResultDTO {
         private String placa;
         private double horas;
@@ -161,7 +136,6 @@ public class VehiculoService {
         private LocalDateTime ingreso;
         private LocalDateTime salida;
         
-        // Getters y Setters
         public String getPlaca() { return placa; }
         public void setPlaca(String placa) { this.placa = placa; }
         

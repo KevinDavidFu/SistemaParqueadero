@@ -1,5 +1,6 @@
 package com.example.parking.mapper;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 
 import com.example.parking.dto.VehiculoDTO;
@@ -28,8 +29,9 @@ public class VehiculoEntityMapper {
             dto.setSalida(entity.getSalida().format(FORMATTER));
         }
         
-        Double totalPagado = entity.getTotalPagado();
-        dto.setTotalPagado(totalPagado != null ? totalPagado : 0.0);
+        // CORRECCIÓN: Manejar BigDecimal correctamente
+        BigDecimal totalPagado = entity.getTotalPagado();
+        dto.setTotalPagado(totalPagado != null ? totalPagado : BigDecimal.ZERO);
         
         Boolean activo = entity.getActivo();
         dto.setActivo(activo != null ? activo : false);

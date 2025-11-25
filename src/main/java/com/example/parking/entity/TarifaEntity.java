@@ -1,5 +1,6 @@
 package com.example.parking.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -22,8 +23,9 @@ public class TarifaEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String tipo;
 
-    @Column(name = "precio_por_hora", nullable = false, precision = 10, scale = 2)
-    private Double precioPorHora;
+    // CORRECCIÓN: Cambiar Double a BigDecimal y remover scale/precision
+    @Column(name = "precio_por_hora", nullable = false)
+    private BigDecimal precioPorHora;
 
     @Column(nullable = false)
     private Boolean activa = true;
@@ -38,6 +40,7 @@ public class TarifaEntity {
     protected void onCreate() {
         creadoEn = LocalDateTime.now();
         actualizadoEn = LocalDateTime.now();
+        if (precioPorHora == null) precioPorHora = BigDecimal.ZERO;
     }
 
     @PreUpdate
@@ -47,14 +50,15 @@ public class TarifaEntity {
 
     public TarifaEntity() {}
 
+    // GETTERS Y SETTERS CORREGIDOS
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
 
-    public Double getPrecioPorHora() { return precioPorHora; }
-    public void setPrecioPorHora(Double precioPorHora) { this.precioPorHora = precioPorHora; }
+    public BigDecimal getPrecioPorHora() { return precioPorHora; }
+    public void setPrecioPorHora(BigDecimal precioPorHora) { this.precioPorHora = precioPorHora; }
 
     public Boolean getActiva() { return activa; }
     public void setActiva(Boolean activa) { this.activa = activa; }
