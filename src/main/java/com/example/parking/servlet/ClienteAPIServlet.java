@@ -5,11 +5,6 @@ import com.example.parking.entity.ClienteEntity;
 import com.example.parking.mapper.ClienteMapper;
 import com.example.parking.repository.ClienteRepository;
 import com.google.gson.Gson;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("CallToPrintStackTrace")
@@ -41,18 +37,6 @@ public class ClienteAPIServlet extends HttpServlet {
     }
 
     @Override
-    @Operation(
-        summary = "Listar todos los clientes",
-        description = "Obtiene la lista completa de clientes registrados en el sistema",
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "Lista de clientes obtenida exitosamente",
-                content = @Content(schema = @Schema(implementation = ClienteDTO.class))
-            ),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-        }
-    )
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -61,6 +45,27 @@ public class ClienteAPIServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         try {
+            // NUEVO: Soporte para obtener por ID
+            String idParam = request.getParameter("id");
+            
+            if (idParam != null) {
+                Integer id = Integer.parseInt(idParam);
+                Optional<ClienteEntity> cliente = clienteRepository.findById(id);
+                
+                Map<String, Object> result = new HashMap<>();
+                if (cliente.isPresent()) {
+                    result.put("success", true);
+                    result.put("data", ClienteMapper.toDTO(cliente.get()));
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    result.put("success", false);
+                    result.put("message", "Cliente no encontrado");
+                }
+                out.print(gson.toJson(result));
+                return;
+            }
+            
+            // Listar todos
             List<ClienteEntity> clientes = clienteRepository.findAll();
             
             List<ClienteDTO> clientesDTO = clientes.stream()
@@ -75,6 +80,12 @@ public class ClienteAPIServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
             out.print(gson.toJson(result));
             
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "ID inválido");
+            out.print(gson.toJson(error));
         } catch (Exception e) {
             System.err.println("[ClienteAPIServlet] ERROR: " + e.getMessage());
             e.printStackTrace();
@@ -90,24 +101,6 @@ public class ClienteAPIServlet extends HttpServlet {
     }
 
     @Override
-    @Operation(
-        summary = "Registrar nuevo cliente",
-        description = "Registra un nuevo cliente en el sistema",
-        parameters = {
-            @Parameter(name = "nombre", description = "Nombre completo del cliente", required = true),
-            @Parameter(name = "documento", description = "Documento de identidad", required = true),
-            @Parameter(name = "telefono", description = "Teléfono de contacto"),
-            @Parameter(name = "email", description = "Correo electrónico"),
-            @Parameter(name = "tipoCliente", description = "Tipo: Regular, VIP, Eventual"),
-            @Parameter(name = "descuento", description = "Porcentaje de descuento (0-100)")
-        },
-        responses = {
-            @ApiResponse(responseCode = "201", description = "Cliente creado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-            @ApiResponse(responseCode = "409", description = "Cliente ya existe"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-        }
-    )
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -124,7 +117,6 @@ public class ClienteAPIServlet extends HttpServlet {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            // Validaciones
             if (nombre == null || nombre.trim().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 result.put("success", false);
@@ -141,7 +133,6 @@ public class ClienteAPIServlet extends HttpServlet {
                 return;
             }
             
-            // Verificar si el cliente ya existe
             if (clienteRepository.findByDocumento(documento).isPresent()) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 result.put("success", false);
@@ -150,7 +141,6 @@ public class ClienteAPIServlet extends HttpServlet {
                 return;
             }
             
-            // Crear entidad
             ClienteEntity cliente = new ClienteEntity();
             cliente.setNombre(nombre.trim());
             cliente.setDocumento(documento.trim());
@@ -165,7 +155,6 @@ public class ClienteAPIServlet extends HttpServlet {
                 }
             }
             
-            // CORRECCIÓN: Convertir String a BigDecimal
             if (descuentoStr != null && !descuentoStr.trim().isEmpty()) {
                 try {
                     double descuentoDouble = Double.parseDouble(descuentoStr.trim());
@@ -181,7 +170,6 @@ public class ClienteAPIServlet extends HttpServlet {
                 cliente.setDescuento(BigDecimal.ZERO);
             }
             
-            // Guardar
             ClienteEntity savedCliente = clienteRepository.save(cliente);
             ClienteDTO clienteDTO = ClienteMapper.toDTO(savedCliente);
             
@@ -204,20 +192,105 @@ public class ClienteAPIServlet extends HttpServlet {
         }
     }
 
+    // NUEVO: Método doPut para actualizar
     @Override
-    @Operation(
-        summary = "Eliminar cliente",
-        description = "Elimina un cliente del sistema por su ID",
-        parameters = {
-            @Parameter(name = "id", description = "ID del cliente a eliminar", required = true)
-        },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Cliente eliminado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "ID no proporcionado"),
-            @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        response.setContentType("application/json;charset=UTF-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        PrintWriter out = response.getWriter();
+        
+        String idParam = request.getParameter("id");
+        String nombre = request.getParameter("nombre");
+        String telefono = request.getParameter("telefono");
+        String email = request.getParameter("email");
+        String tipoClienteStr = request.getParameter("tipoCliente");
+        String descuentoStr = request.getParameter("descuento");
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            if (idParam == null || idParam.trim().isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                result.put("success", false);
+                result.put("message", "El ID es requerido");
+                out.print(gson.toJson(result));
+                return;
+            }
+            
+            Integer id = Integer.parseInt(idParam);
+            Optional<ClienteEntity> clienteOpt = clienteRepository.findById(id);
+            
+            if (clienteOpt.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                result.put("success", false);
+                result.put("message", "Cliente no encontrado");
+                out.print(gson.toJson(result));
+                return;
+            }
+            
+            ClienteEntity cliente = clienteOpt.get();
+            
+            // Actualizar solo los campos proporcionados
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                cliente.setNombre(nombre.trim());
+            }
+            
+            if (telefono != null) {
+                cliente.setTelefono(telefono.trim().isEmpty() ? null : telefono.trim());
+            }
+            
+            if (email != null) {
+                cliente.setEmail(email.trim().isEmpty() ? null : email.trim());
+            }
+            
+            if (tipoClienteStr != null && !tipoClienteStr.trim().isEmpty()) {
+                try {
+                    cliente.setTipoCliente(ClienteEntity.TipoCliente.valueOf(tipoClienteStr.trim()));
+                } catch (IllegalArgumentException e) {
+                    // Mantener el valor actual si es inválido
+                }
+            }
+            
+            if (descuentoStr != null && !descuentoStr.trim().isEmpty()) {
+                try {
+                    double descuentoDouble = Double.parseDouble(descuentoStr.trim());
+                    if (descuentoDouble >= 0 && descuentoDouble <= 100) {
+                        cliente.setDescuento(BigDecimal.valueOf(descuentoDouble));
+                    }
+                } catch (NumberFormatException e) {
+                    // Mantener el valor actual si es inválido
+                }
+            }
+            
+            ClienteEntity updated = clienteRepository.save(cliente);
+            
+            result.put("success", true);
+            result.put("message", "Cliente actualizado correctamente");
+            result.put("data", ClienteMapper.toDTO(updated));
+            
+            out.print(gson.toJson(result));
+            
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            result.put("success", false);
+            result.put("message", "ID inválido");
+            out.print(gson.toJson(result));
+        } catch (Exception e) {
+            System.err.println("[ClienteAPIServlet] ERROR en PUT: " + e.getMessage());
+            e.printStackTrace();
+            
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            result.put("success", false);
+            result.put("message", "Error al actualizar cliente: " + e.getMessage());
+            out.print(gson.toJson(result));
+        } finally {
+            out.flush();
         }
-    )
+    }
+
+    @Override
     @SuppressWarnings("CallToPrintStackTrace")
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -270,5 +343,14 @@ public class ClienteAPIServlet extends HttpServlet {
         } finally {
             out.flush();
         }
+    }
+    
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }
