@@ -21,19 +21,18 @@
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
-            <!-- Conexión a MySQL - ASEGÚRATE DE QUE LA CONTRASEÑA SEA CORRECTA -->
+            <!-- Conexión a MySQL -->
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="jakarta.persistence.jdbc.url"
                       value="jdbc:mysql://localhost:3306/parkingDB?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC&amp;characterEncoding=UTF-8"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
-            <!-- CAMBIA ESTA CONTRASEÑA POR LA CORRECTA -->
             <property name="jakarta.persistence.jdbc.password" value="Kevin12345*"/>
 
             <!-- Configuración Hibernate -->
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
             
             <!-- IMPORTANTE: Usar 'validate' en lugar de 'update' para evitar cambios automáticos -->
-            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
             
             <!-- Logs detallados para debugging -->
             <property name="hibernate.show_sql" value="true"/>
